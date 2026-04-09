@@ -1,4 +1,9 @@
 package com.easyexpenses.api.repositories;
 
-public interface ExpenseRepository {
+import com.easyexpenses.api.entities.Expense;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 }
