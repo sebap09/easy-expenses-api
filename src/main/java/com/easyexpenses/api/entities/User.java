@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -22,5 +23,9 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy="user")
-    private Set<Expense> expenses;
+    private Set<Expense> expenses = new HashSet<>();;
+
+    public void addNewExpense(Expense expense){
+        this.expenses.add(expense);
+    }
 }

@@ -1,13 +1,13 @@
 package com.easyexpenses.api.controllers;
 
+import com.easyexpenses.api.dtos.AddNewExpenseRequest;
+import com.easyexpenses.api.dtos.ExpenseResponse;
 import com.easyexpenses.api.entities.Expense;
 import com.easyexpenses.api.services.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,5 +25,12 @@ public class ExpenseController {
     @GetMapping
     public ResponseEntity<List<Expense>> getAllExpenses() {
         return new ResponseEntity<>(expenseService.getAllExpenses(), HttpStatus.OK);
+    }
+
+    // POST http://localhost:8080/api/v1/expenses
+    @PostMapping
+    public ResponseEntity<ExpenseResponse> addNewExpense(@RequestBody AddNewExpenseRequest addNewExpenseRequest) {
+        ExpenseResponse expenseResponse = expenseService.addNewExpense(addNewExpenseRequest);
+        return new ResponseEntity<>(expenseResponse, HttpStatus.CREATED);
     }
 }
