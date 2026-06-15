@@ -23,9 +23,17 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy="user")
-    private Set<Expense> expenses = new HashSet<>();;
+    private Set<Expense> expenses = new HashSet<>();
+
+    @OneToMany(mappedBy="user")
+    private Set<UserPaymentMethod> userPaymentMethods = new HashSet<>();
 
     public void addNewExpense(Expense expense){
         this.expenses.add(expense);
+    }
+
+    public void addNewUserPaymentMethod(UserPaymentMethod userPaymentMethod){
+        this.userPaymentMethods.add(userPaymentMethod);
+        userPaymentMethod.setUser(this);
     }
 }

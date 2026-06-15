@@ -6,30 +6,29 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name="expense")
+@Table(name="user_payment_method")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Expense {
+public class UserPaymentMethod {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+    private String name;
 
     @ManyToOne
     @JoinColumn(name="userId", nullable=false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name="userPaymentMethodId", nullable=false)
-    private UserPaymentMethod userPaymentMethod;
+    @OneToMany(mappedBy="userPaymentMethod")
+    private Set<Expense> expenses = new HashSet<>();
 
-    private Long categoryId;
-    private Long subcategoryId;
-    private Date date;
-    private Double value;
-    private String comment;
+    public void addNewExpense(Expense expense){
+        this.expenses.add(expense);
+    }
 }
