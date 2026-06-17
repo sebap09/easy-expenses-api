@@ -94,4 +94,53 @@ public class ExpenseDomainIntegrationTest {
                 savedExpense.getUserPaymentMethod().getUser().getId()
         );
     }
+
+    @Test
+    void shouldPersistMultipleExpensesUsingDifferentUserPaymentMethods() {
+        User user = new UserBuilder().build();
+
+        UserPaymentMethod card = new UserPaymentMethodBuilder()
+                .user(user)
+                .name("CARD")
+                .build();
+
+        UserPaymentMethod cash = new UserPaymentMethodBuilder()
+                .user(user)
+                .name("CASH")
+                .build();
+
+        Expense cardExpense = new ExpenseBuilder()
+                .user(user)
+                .userPaymentMethod(card)
+                .build();
+
+        Expense cashExpense = new ExpenseBuilder()
+                .user(user)
+                .userPaymentMethod(cash)
+                .build();
+
+        userRepository.save(user);
+        userPaymentMethodRepository.save(card);
+        userPaymentMethodRepository.save(cash);
+        expenseRepository.save(cardExpense);
+        expenseRepository.save(cashExpense);
+
+        em.flush();
+        em.clear();
+
+        Expense savedCardExpense = expenseRepository.findById(cardExpense.getId()).orElseThrow();
+        assertEquals("CARD",
+                savedCardExpense.getUserPaymentMethod().getName());
+        assertEquals(2,
+                savedCardExpense.getUser().getUserPaymentMethods().size());
+
+        Expense savedCashExpense = expenseRepository.findById(cashExpense.getId()).orElseThrow();
+        assertEquals("CASH",
+                savedCashExpense.getUserPaymentMethod().getName());
+        assertEquals(2,
+                savedCashExpense.getUser().getUserPaymentMethods().size());
+
+        assertEquals(2,
+                savedCashExpense.getUser().getExpenses().size());
+    }
 }
