@@ -1,10 +1,7 @@
 package com.easyexpenses.api.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,9 +23,11 @@ public class UserPaymentMethod {
     private User user;
 
     @OneToMany(mappedBy="userPaymentMethod")
-    private Set<Expense> expenses = new HashSet<>();
+    @Setter(AccessLevel.NONE)
+    private Set<Expense> expensesRelatedWithThisUserPaymentMethod = new HashSet<>();
 
-    public void addNewExpense(Expense expense){
-        this.expenses.add(expense);
+    public void addNewExpenseRelatedWithThisUserPaymentMethod(Expense expense){
+        this.expensesRelatedWithThisUserPaymentMethod.add(expense);
+        expense.setUserPaymentMethod(this);
     }
 }

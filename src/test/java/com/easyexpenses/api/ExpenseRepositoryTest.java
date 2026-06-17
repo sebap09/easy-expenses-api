@@ -36,7 +36,7 @@ public class ExpenseRepositoryTest {
         expense.setValue(100.99);
         expense.setCategoryId(1L);
         expense.setSubcategoryId(1L);
-        expense.setPaymentTypeId(1L);
+//        expense.setPaymentTypeId(1L);
 
         user.setUsername("user1");
         user.setPassword("user1");

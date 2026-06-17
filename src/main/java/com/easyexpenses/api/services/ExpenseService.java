@@ -59,7 +59,7 @@ public class ExpenseService {
         user.addNewExpense(expense);
         expense.setUser(user);
         //UserPaymentMethod <-> Expense
-        userPaymentMethod.addNewExpense(expense);
+        userPaymentMethod.addNewExpenseRelatedWithThisUserPaymentMethod(expense);
         expense.setUserPaymentMethod(userPaymentMethod);
 
         return expenseMapper.toResponse(expenseRepository.save(expense));

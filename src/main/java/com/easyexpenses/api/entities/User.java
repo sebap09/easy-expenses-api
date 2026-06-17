@@ -1,10 +1,7 @@
 package com.easyexpenses.api.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,14 +19,23 @@ public class User {
     private String username;
     private String password;
 
-    @OneToMany(mappedBy="user")
+    @OneToMany(
+            mappedBy="user",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true)
+    @Setter(AccessLevel.NONE)
     private Set<Expense> expenses = new HashSet<>();
 
-    @OneToMany(mappedBy="user")
+    @OneToMany(
+            mappedBy="user",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true)
+    @Setter(AccessLevel.NONE)
     private Set<UserPaymentMethod> userPaymentMethods = new HashSet<>();
 
     public void addNewExpense(Expense expense){
         this.expenses.add(expense);
+        expense.setUser(this);
     }
 
     public void addNewUserPaymentMethod(UserPaymentMethod userPaymentMethod){
