@@ -33,6 +33,13 @@ public class User {
     @Setter(AccessLevel.NONE)
     private Set<UserPaymentMethod> userPaymentMethods = new HashSet<>();
 
+    @OneToMany(
+            mappedBy="user",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true)
+    @Setter(AccessLevel.NONE)
+    private Set<UserExpenseCategory> userExpenseCategories = new HashSet<>();
+
     public void addNewExpense(Expense expense){
         this.expenses.add(expense);
         expense.setUser(this);
@@ -41,5 +48,10 @@ public class User {
     public void addNewUserPaymentMethod(UserPaymentMethod userPaymentMethod){
         this.userPaymentMethods.add(userPaymentMethod);
         userPaymentMethod.setUser(this);
+    }
+
+    public void addNewUserCategory(UserExpenseCategory userExpenseCategory){
+        this.userExpenseCategories.add(userExpenseCategory);
+        userExpenseCategory.setUser(this);
     }
 }

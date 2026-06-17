@@ -2,6 +2,7 @@ package com.easyexpenses.api.builders;
 
 import com.easyexpenses.api.entities.Expense;
 import com.easyexpenses.api.entities.User;
+import com.easyexpenses.api.entities.UserExpenseCategory;
 import com.easyexpenses.api.entities.UserPaymentMethod;
 
 import java.util.Date;
@@ -11,11 +12,11 @@ public class ExpenseBuilder {
     private Date date = new Date();
     private String comment = "Comment";
     private double value = 100.99;
-    private Long categoryId = 1L;
     private Long subcategoryId = 1L;
 
     private User user;
     private UserPaymentMethod userPaymentMethod;
+    private UserExpenseCategory userExpenseCategory;
 
     public ExpenseBuilder date(Date date) {
         this.date = date;
@@ -29,11 +30,6 @@ public class ExpenseBuilder {
 
     public ExpenseBuilder value(double value) {
         this.value = value;
-        return this;
-    }
-
-    public ExpenseBuilder categoryId(Long categoryId) {
-        this.categoryId = categoryId;
         return this;
     }
 
@@ -52,12 +48,16 @@ public class ExpenseBuilder {
         return this;
     }
 
+    public ExpenseBuilder userExpenseCategory(UserExpenseCategory userExpenseCategory) {
+        this.userExpenseCategory = userExpenseCategory;
+        return this;
+    }
+
     public Expense build() {
         Expense expense = new Expense();
         expense.setDate(date);
         expense.setComment(comment);
         expense.setValue(value);
-        expense.setCategoryId(categoryId);
         expense.setSubcategoryId(subcategoryId);
 
         if (user != null) {
@@ -66,6 +66,10 @@ public class ExpenseBuilder {
 
         if (userPaymentMethod != null) {
             userPaymentMethod.addNewExpenseRelatedWithThisUserPaymentMethod(expense);
+        }
+
+        if (userExpenseCategory != null) {
+            userExpenseCategory.addNewExpenseRelatedWithThisCategory(expense);
         }
         return expense;
     }

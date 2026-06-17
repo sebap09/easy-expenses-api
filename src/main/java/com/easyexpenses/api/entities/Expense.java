@@ -1,10 +1,7 @@
 package com.easyexpenses.api.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
@@ -27,7 +24,10 @@ public class Expense {
     @JoinColumn(name="userPaymentMethodId", nullable=false)
     private UserPaymentMethod userPaymentMethod;
 
-    private Long categoryId;
+    @ManyToOne
+    @JoinColumn(name="userExpenseCategoryId", nullable=false)
+    private UserExpenseCategory userExpenseCategory;
+
     private Long subcategoryId;
     private Date date;
     private Double value;

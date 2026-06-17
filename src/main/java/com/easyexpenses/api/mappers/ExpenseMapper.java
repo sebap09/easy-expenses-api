@@ -10,7 +10,7 @@ public class ExpenseMapper {
         return new ExpenseResponse(
                 expense.getId(),
                 expense.getUser().getId(),
-                expense.getCategoryId(),
+                expense.getUserExpenseCategory().getId(),
                 expense.getSubcategoryId(),
                 expense.getUserPaymentMethod().getId(),
                 expense.getDate(),
