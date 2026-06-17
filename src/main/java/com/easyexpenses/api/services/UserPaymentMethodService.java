@@ -1,6 +1,5 @@
 package com.easyexpenses.api.services;
 
-import com.easyexpenses.api.entities.User;
 import com.easyexpenses.api.entities.UserPaymentMethod;
 import com.easyexpenses.api.repositories.UserPaymentMethodRepository;
 import org.springframework.beans.factory.annotation.Autowired;

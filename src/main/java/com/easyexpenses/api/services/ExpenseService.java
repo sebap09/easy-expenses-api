@@ -4,6 +4,7 @@ import com.easyexpenses.api.dtos.AddNewExpenseRequest;
 import com.easyexpenses.api.dtos.ExpenseResponse;
 import com.easyexpenses.api.entities.Expense;
 import com.easyexpenses.api.entities.User;
+import com.easyexpenses.api.entities.UserExpenseCategory;
 import com.easyexpenses.api.entities.UserPaymentMethod;
 import com.easyexpenses.api.mappers.ExpenseMapper;
 import com.easyexpenses.api.repositories.ExpenseRepository;
@@ -17,13 +18,15 @@ public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final UserService userService;
     private final UserPaymentMethodService userPaymentMethodService;
+    private final UserExpenseCategoryService userExpenseCategoryService;
     private final ExpenseMapper expenseMapper;
 
     @Autowired
-    public ExpenseService(ExpenseRepository expenseRepository, UserService userService, UserPaymentMethodService userPaymentMethodService, ExpenseMapper expenseMapper) {
+    public ExpenseService(ExpenseRepository expenseRepository, UserService userService, UserPaymentMethodService userPaymentMethodService, UserExpenseCategoryService userExpenseCategoryService, ExpenseMapper expenseMapper) {
         this.expenseRepository = expenseRepository;
         this.userService = userService;
         this.userPaymentMethodService = userPaymentMethodService;
+        this.userExpenseCategoryService = userExpenseCategoryService;
         this.expenseMapper = expenseMapper;
     }
 
@@ -37,14 +40,13 @@ public class ExpenseService {
     public ExpenseResponse addNewExpense(AddNewExpenseRequest addNewExpenseRequest) {
         User user = userService.getUser(addNewExpenseRequest.userId());
         UserPaymentMethod userPaymentMethod = userPaymentMethodService.getUserPaymentMethod(addNewExpenseRequest.userPaymentMethodId());
-        //userCategory
+        UserExpenseCategory userExpenseCategory = userExpenseCategoryService.getUserExpenseCategory(addNewExpenseRequest.categoryId());
         //userSubCategory
 
         Expense expense = new Expense();
         expense.setDate(addNewExpenseRequest.date());
         expense.setValue(addNewExpenseRequest.value());
         expense.setComment(addNewExpenseRequest.comment());
-        expense.setCategoryId(addNewExpenseRequest.categoryId());
         expense.setSubcategoryId(addNewExpenseRequest.subCategoryId());
 
         //relationships mappings
@@ -52,6 +54,8 @@ public class ExpenseService {
         user.addNewExpense(expense);
         //UserPaymentMethod <-> Expense
         userPaymentMethod.addNewExpenseRelatedWithThisUserPaymentMethod(expense);
+        //UserExpenseCategory <-> Expense
+        userExpenseCategory.addNewExpenseRelatedWithThisCategory(expense);
 
         return expenseMapper.toResponse(expenseRepository.save(expense));
     }
