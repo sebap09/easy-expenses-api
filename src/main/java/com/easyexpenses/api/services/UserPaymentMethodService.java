@@ -18,13 +18,4 @@ public class UserPaymentMethodService {
     public UserPaymentMethod getUserPaymentMethod(Long id){
         return userPaymentMethodRepository.findById(id).orElseThrow();
     }
-
-    public UserPaymentMethod mockUserPaymentMethod(User user){
-        UserPaymentMethod userPaymentMethod = new UserPaymentMethod();
-        userPaymentMethod.setName("Cash");
-        userPaymentMethod.setUser(user);
-        user.addNewUserPaymentMethod(userPaymentMethod);
-
-        return userPaymentMethodRepository.save(userPaymentMethod);
-    }
 }

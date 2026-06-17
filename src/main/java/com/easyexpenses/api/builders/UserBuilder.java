@@ -1,4 +1,4 @@
-package com.easyexpenses.api.factory;
+package com.easyexpenses.api.builders;
 import com.easyexpenses.api.entities.User;
 
 public class UserBuilder {

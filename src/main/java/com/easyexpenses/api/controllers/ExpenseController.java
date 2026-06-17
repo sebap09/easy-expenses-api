@@ -23,7 +23,7 @@ public class ExpenseController {
 
     // GET http://localhost:8080/api/v1/expenses
     @GetMapping
-    public ResponseEntity<List<Expense>> getAllExpenses() {
+    public ResponseEntity<List<ExpenseResponse>> getAllExpenses() {
         return new ResponseEntity<>(expenseService.getAllExpenses(), HttpStatus.OK);
     }
 

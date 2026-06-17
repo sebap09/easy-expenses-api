@@ -27,20 +27,15 @@ public class ExpenseService {
         this.expenseMapper = expenseMapper;
     }
 
-    public List<Expense> getAllExpenses() {
-        return expenseRepository.findAll();
+    public List<ExpenseResponse> getAllExpenses() {
+        return expenseRepository.findAll()
+                .stream()
+                .map(expenseMapper::toResponse)
+                .toList();
     }
 
     public ExpenseResponse addNewExpense(AddNewExpenseRequest addNewExpenseRequest) {
-        //those should be already existing in DB upon new Expense creation
-        userService.mockUser();
         User user = userService.getUser(addNewExpenseRequest.userId());
-        userPaymentMethodService.mockUserPaymentMethod(user);
-        //userCategory
-        //userSubCategory
-
-
-
         UserPaymentMethod userPaymentMethod = userPaymentMethodService.getUserPaymentMethod(addNewExpenseRequest.userPaymentMethodId());
         //userCategory
         //userSubCategory
@@ -49,18 +44,14 @@ public class ExpenseService {
         expense.setDate(addNewExpenseRequest.date());
         expense.setValue(addNewExpenseRequest.value());
         expense.setComment(addNewExpenseRequest.comment());
-
         expense.setCategoryId(addNewExpenseRequest.categoryId());
         expense.setSubcategoryId(addNewExpenseRequest.subCategoryId());
-
 
         //relationships mappings
         //User <-> Expense
         user.addNewExpense(expense);
-        expense.setUser(user);
         //UserPaymentMethod <-> Expense
         userPaymentMethod.addNewExpenseRelatedWithThisUserPaymentMethod(expense);
-        expense.setUserPaymentMethod(userPaymentMethod);
 
         return expenseMapper.toResponse(expenseRepository.save(expense));
     }

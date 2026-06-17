@@ -1,4 +1,4 @@
-package com.easyexpenses.api.factory;
+package com.easyexpenses.api.builders;
 
 import com.easyexpenses.api.entities.Expense;
 import com.easyexpenses.api.entities.User;
