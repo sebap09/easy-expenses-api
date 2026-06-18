@@ -1,17 +1,8 @@
 package com.easyexpenses.api;
 
-import com.easyexpenses.api.builders.UserExpenseCategoryBuilder;
-import com.easyexpenses.api.entities.Expense;
-import com.easyexpenses.api.entities.User;
-import com.easyexpenses.api.entities.UserExpenseCategory;
-import com.easyexpenses.api.entities.UserPaymentMethod;
-import com.easyexpenses.api.builders.ExpenseBuilder;
-import com.easyexpenses.api.builders.UserBuilder;
-import com.easyexpenses.api.builders.UserPaymentMethodBuilder;
-import com.easyexpenses.api.repositories.ExpenseRepository;
-import com.easyexpenses.api.repositories.UserExpenseCategoryRepository;
-import com.easyexpenses.api.repositories.UserPaymentMethodRepository;
-import com.easyexpenses.api.repositories.UserRepository;
+import com.easyexpenses.api.builders.*;
+import com.easyexpenses.api.entities.*;
+import com.easyexpenses.api.repositories.*;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +25,9 @@ public class ExpenseDomainIntegrationTest {
     @Autowired
     private UserExpenseCategoryRepository userExpenseCategoryRepository;
 
+    @Autowired
+    private UserExpenseSubCategoryRepository userExpenseSubCategoryRepository;
+
     //required for flush() and clear() to be able to test whole database cycle instead of only persistence context
     @Autowired
     private EntityManager em;
@@ -51,16 +45,23 @@ public class ExpenseDomainIntegrationTest {
                 .user(user)
                 .build();
 
+        UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategoryBuilder()
+                .user(user)
+                .userExpenseCategory(userExpenseCategory)
+                .build();
+
         Expense expense = new ExpenseBuilder()
                 .user(user)
                 .userPaymentMethod(userPaymentMethod)
                 .userExpenseCategory(userExpenseCategory)
+                .userExpenseSubCategory(userExpenseSubCategory)
                 .build();
 
         //saving entities to db
         userRepository.save(user);
         userPaymentMethodRepository.save(userPaymentMethod);
         userExpenseCategoryRepository.save(userExpenseCategory);
+        userExpenseSubCategoryRepository.save(userExpenseSubCategory);
         expenseRepository.save(expense);
 
         //push from persistence context to actual db
@@ -75,20 +76,16 @@ public class ExpenseDomainIntegrationTest {
         assertEquals(userPaymentMethod.getName(), savedExpense.getUserPaymentMethod().getName());
         //user expense category data is persisted correctly
         assertEquals(userExpenseCategory.getName(), savedExpense.getUserExpenseCategory().getName());
+        //user expense sub category data is persisted correctly
+        assertEquals(userExpenseSubCategory.getName(), savedExpense.getUserExpenseSubCategory().getName());
         //user data is persisted correctly
         assertEquals(user.getUsername(), savedExpense.getUser().getUsername());
 
+        //8
         //OneToMany mappings, remember to not use equals (since the hash is not the same)
         assertTrue(
                 savedExpense.getUser()
                         .getExpenses()
-                        .stream()
-                        .anyMatch(e -> e.getId().equals(savedExpense.getId()))
-        );
-
-        assertTrue(
-                savedExpense.getUserPaymentMethod()
-                        .getExpensesRelatedWithThisUserPaymentMethod()
                         .stream()
                         .anyMatch(e -> e.getId().equals(savedExpense.getId()))
         );
@@ -112,6 +109,15 @@ public class ExpenseDomainIntegrationTest {
         );
 
         assertTrue(
+                savedExpense.getUser()
+                        .getUserExpenseSubCategories()
+                        .stream()
+                        .anyMatch(pm ->
+                                pm.getId().equals(savedExpense.getUserExpenseSubCategory().getId())
+                        )
+        );
+
+        assertTrue(
                 savedExpense.getUserExpenseCategory()
                         .getExpensesRelatedWithThisCategory()
                         .stream()
@@ -119,6 +125,32 @@ public class ExpenseDomainIntegrationTest {
                                 pm.getId().equals(savedExpense.getId())
                         )
         );
+
+        assertTrue(
+                savedExpense.getUserExpenseCategory()
+                        .getSubCategoriesRelatedWithThisCategory()
+                        .stream()
+                        .anyMatch(pm ->
+                                pm.getId().equals(savedExpense.getUserExpenseSubCategory().getId())
+                        )
+        );
+
+        assertTrue(
+                savedExpense.getUserPaymentMethod()
+                        .getExpensesRelatedWithThisUserPaymentMethod()
+                        .stream()
+                        .anyMatch(e -> e.getId().equals(savedExpense.getId()))
+        );
+
+        assertTrue(
+                savedExpense.getUserExpenseSubCategory()
+                        .getExpensesRelatedWithThisSubCategory()
+                        .stream()
+                        .anyMatch(pm ->
+                                pm.getId().equals(savedExpense.getId())
+                        )
+        );
+
 
         //User <-> UserPaymentMethod consistency check
         assertEquals(
@@ -130,6 +162,12 @@ public class ExpenseDomainIntegrationTest {
         assertEquals(
                 savedExpense.getUser().getId(),
                 savedExpense.getUserExpenseCategory().getUser().getId()
+        );
+
+        //User <-> UserExpenseSubCategory consistency check
+        assertEquals(
+                savedExpense.getUser().getId(),
+                savedExpense.getUserExpenseSubCategory().getUser().getId()
         );
     }
 
@@ -151,22 +189,30 @@ public class ExpenseDomainIntegrationTest {
                 .user(user)
                 .build();
 
+        UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategoryBuilder()
+                .user(user)
+                .userExpenseCategory(userExpenseCategory)
+                .build();
+
         Expense cardExpense = new ExpenseBuilder()
                 .user(user)
                 .userPaymentMethod(card)
                 .userExpenseCategory(userExpenseCategory)
+                .userExpenseSubCategory(userExpenseSubCategory)
                 .build();
 
         Expense cashExpense = new ExpenseBuilder()
                 .user(user)
                 .userPaymentMethod(cash)
                 .userExpenseCategory(userExpenseCategory)
+                .userExpenseSubCategory(userExpenseSubCategory)
                 .build();
 
         userRepository.save(user);
         userPaymentMethodRepository.save(card);
         userPaymentMethodRepository.save(cash);
         userExpenseCategoryRepository.save(userExpenseCategory);
+        userExpenseSubCategoryRepository.save(userExpenseSubCategory);
         expenseRepository.save(cardExpense);
         expenseRepository.save(cashExpense);
 
@@ -189,5 +235,7 @@ public class ExpenseDomainIntegrationTest {
                 savedCashExpense.getUser().getExpenses().size());
         assertEquals(savedCardExpense.getUserExpenseCategory().getName(),
                 savedCashExpense.getUserExpenseCategory().getName());
+        assertEquals(savedCardExpense.getUserExpenseSubCategory().getName(),
+                savedCashExpense.getUserExpenseSubCategory().getName());
     }
 }
