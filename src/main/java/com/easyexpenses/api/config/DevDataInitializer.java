@@ -2,11 +2,14 @@ package com.easyexpenses.api.config;
 
 import com.easyexpenses.api.builders.UserBuilder;
 import com.easyexpenses.api.builders.UserExpenseCategoryBuilder;
+import com.easyexpenses.api.builders.UserExpenseSubCategoryBuilder;
 import com.easyexpenses.api.builders.UserPaymentMethodBuilder;
 import com.easyexpenses.api.entities.User;
 import com.easyexpenses.api.entities.UserExpenseCategory;
+import com.easyexpenses.api.entities.UserExpenseSubCategory;
 import com.easyexpenses.api.entities.UserPaymentMethod;
 import com.easyexpenses.api.repositories.UserExpenseCategoryRepository;
+import com.easyexpenses.api.repositories.UserExpenseSubCategoryRepository;
 import com.easyexpenses.api.repositories.UserPaymentMethodRepository;
 import com.easyexpenses.api.repositories.UserRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -22,7 +25,8 @@ public class DevDataInitializer {
     CommandLineRunner init(
             UserRepository userRepository,
             UserPaymentMethodRepository paymentMethodRepository,
-            UserExpenseCategoryRepository userExpenseCategoryRepository
+            UserExpenseCategoryRepository userExpenseCategoryRepository,
+            UserExpenseSubCategoryRepository userExpenseSubCategoryRepository
     ) {
         return args -> {
             User user = new UserBuilder()
@@ -39,9 +43,16 @@ public class DevDataInitializer {
                     .name("Zakupy")
                     .build();
 
+            UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategoryBuilder()
+                    .user(user)
+                    .name("Jedzenie/kosmetyki/chemia/inne")
+                    .userExpenseCategory(userExpenseCategory)
+                    .build();
+
             userRepository.save(user);
             paymentMethodRepository.save(card);
             userExpenseCategoryRepository.save(userExpenseCategory);
+            userExpenseSubCategoryRepository.save(userExpenseSubCategory);
         };
     }
 }
