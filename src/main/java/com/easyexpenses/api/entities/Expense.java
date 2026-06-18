@@ -28,7 +28,10 @@ public class Expense {
     @JoinColumn(name="userExpenseCategoryId", nullable=false)
     private UserExpenseCategory userExpenseCategory;
 
-    private Long subcategoryId;
+    @ManyToOne
+    @JoinColumn(name="userExpenseSubCategoryId", nullable=false)
+    private UserExpenseSubCategory userExpenseSubCategory;
+
     private Date date;
     private Double value;
     private String comment;

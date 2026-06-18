@@ -11,7 +11,7 @@ public class ExpenseMapper {
                 expense.getId(),
                 expense.getUser().getId(),
                 expense.getUserExpenseCategory().getId(),
-                expense.getSubcategoryId(),
+                expense.getUserExpenseSubCategory().getId(),
                 expense.getUserPaymentMethod().getId(),
                 expense.getDate(),
                 expense.getValue(),
