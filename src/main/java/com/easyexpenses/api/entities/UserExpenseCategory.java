@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name="expense_category")
+@Table(name="user_expense_category")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -26,8 +26,17 @@ public class UserExpenseCategory {
     @Setter(AccessLevel.NONE)
     private Set<Expense> expensesRelatedWithThisCategory = new HashSet<>();
 
+    @OneToMany(mappedBy="userExpenseCategory")
+    @Setter(AccessLevel.NONE)
+    private Set<UserExpenseSubCategory> subCategoriesRelatedWithThisCategory = new HashSet<>();
+
     public void addNewExpenseRelatedWithThisCategory(Expense expense){
         this.expensesRelatedWithThisCategory.add(expense);
         expense.setUserExpenseCategory(this);
+    }
+
+    public void addNewSubCategoryRelatedWithThisCategory(UserExpenseSubCategory userExpenseSubCategory){
+        this.subCategoriesRelatedWithThisCategory.add(userExpenseSubCategory);
+        userExpenseSubCategory.setUserExpenseCategory(this);
     }
 }
