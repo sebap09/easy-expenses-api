@@ -14,6 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class User {
     @Id
+    @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     private String username;
