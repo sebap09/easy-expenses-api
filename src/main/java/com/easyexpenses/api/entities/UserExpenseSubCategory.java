@@ -14,9 +14,18 @@ import java.util.Set;
 @NoArgsConstructor
 public class UserExpenseSubCategory {
     @Id
+    @Column(unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+
+    @Column(unique = true, nullable = false)
     private String name;
+
+    @PrePersist
+    @PreUpdate
+    private void normalize() {
+        name = name.toUpperCase();
+    }
 
     @ManyToOne
     @JoinColumn(name="userId", nullable=false)
