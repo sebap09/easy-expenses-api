@@ -1,4 +1,4 @@
-package com.easyexpenses.api;
+package com.easyexpenses.api.integrations;
 
 import com.easyexpenses.api.builders.*;
 import com.easyexpenses.api.entities.*;

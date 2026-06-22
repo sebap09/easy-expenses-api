@@ -1,14 +1,18 @@
 package com.easyexpenses.api.services;
 
+import com.easyexpenses.api.builders.ExpenseBuilder;
 import com.easyexpenses.api.dtos.AddNewExpenseRequest;
 import com.easyexpenses.api.dtos.ExpenseResponse;
 import com.easyexpenses.api.entities.*;
+import com.easyexpenses.api.errors.ErrorCode;
+import com.easyexpenses.api.errors.ValidationException;
 import com.easyexpenses.api.mappers.ExpenseMapper;
 import com.easyexpenses.api.repositories.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ExpenseService {
@@ -42,21 +46,54 @@ public class ExpenseService {
         UserExpenseCategory userExpenseCategory = userExpenseCategoryService.getUserExpenseCategory(addNewExpenseRequest.categoryId());
         UserExpenseSubCategory userExpenseSubCategory = userExpenseSubCategoryService.getUserExpenseSubCategory(addNewExpenseRequest.subCategoryId());
 
-        Expense expense = new Expense();
-        expense.setDate(addNewExpenseRequest.date());
-        expense.setValue(addNewExpenseRequest.value());
-        expense.setComment(addNewExpenseRequest.comment());
+        validateDomainConstraints(user, userPaymentMethod, userExpenseCategory, userExpenseSubCategory);
 
-        //relationships mappings
-        //User <-> Expense
-        user.addNewExpense(expense);
-        //UserPaymentMethod <-> Expense
-        userPaymentMethod.addNewExpenseRelatedWithThisUserPaymentMethod(expense);
-        //UserExpenseCategory <-> Expense
-        userExpenseCategory.addNewExpenseRelatedWithThisCategory(expense);
-        //UserExpenseSubCategory <-> Expense
-        userExpenseSubCategory.addNewExpenseRelatedWithThisSubCategory(expense);
+        Expense expense = new ExpenseBuilder()
+                .user(user)
+                .userPaymentMethod(userPaymentMethod)
+                .userExpenseCategory(userExpenseCategory)
+                .userExpenseSubCategory(userExpenseSubCategory)
+                .value(addNewExpenseRequest.value())
+                .date(addNewExpenseRequest.date())
+                .comment(addNewExpenseRequest.comment())
+                .build();
 
         return expenseMapper.toResponse(expenseRepository.save(expense));
+    }
+
+    private boolean isUserIdConsistentAcrossDomain(
+            User user,
+            UserPaymentMethod userPaymentMethod,
+            UserExpenseCategory userExpenseCategory,
+            UserExpenseSubCategory userExpenseSubCategory
+    ) {
+        Long userId = user.getId();
+        return Objects.equals(userId, userPaymentMethod.getUser().getId()) &&
+                Objects.equals(userId, userExpenseCategory.getUser().getId()) &&
+                Objects.equals(userId, userExpenseSubCategory.getUser().getId());
+    }
+
+    private boolean isSubCategoryAssignedToProperCategory(
+            UserExpenseCategory userExpenseCategory,
+            UserExpenseSubCategory userExpenseSubCategory
+    ) {
+        return Objects.equals(userExpenseSubCategory.getUserExpenseCategory().getId(), userExpenseCategory.getId());
+    }
+
+    private void validateDomainConstraints(
+            User user,
+            UserPaymentMethod userPaymentMethod,
+            UserExpenseCategory userExpenseCategory,
+            UserExpenseSubCategory userExpenseSubCategory
+    ){
+        if(!isUserIdConsistentAcrossDomain(
+                user,
+                userPaymentMethod,
+                userExpenseCategory,
+                userExpenseSubCategory))
+            throw new ValidationException("User Id does not match across domain data", ErrorCode.INVALID_USER_RELATIONSHIP);
+
+        if(!isSubCategoryAssignedToProperCategory(userExpenseCategory, userExpenseSubCategory))
+            throw new ValidationException("Sub-category assignment not correct", ErrorCode.SUBCATEGORY_CATEGORY_MISMATCH);
     }
 }

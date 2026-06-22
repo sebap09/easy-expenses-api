@@ -1,8 +1,7 @@
-package com.easyexpenses.api;
+package com.easyexpenses.api.repositories;
 
 import com.easyexpenses.api.builders.*;
 import com.easyexpenses.api.entities.*;
-import com.easyexpenses.api.repositories.*;
 import jakarta.persistence.EntityManager;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
@@ -42,7 +41,6 @@ public class UserPaymentMethodTest {
 
     @Test
     void shouldThrowExceptionWhenNameIsNotUnique() {
-        //entities & relationships data
         User user = new UserBuilder().build();
         String name = "Cash";
         UserPaymentMethod userPaymentMethod = new UserPaymentMethodBuilder()

@@ -1,11 +1,9 @@
-package com.easyexpenses.api;
+package com.easyexpenses.api.repositories;
 
 import com.easyexpenses.api.builders.UserBuilder;
 import com.easyexpenses.api.builders.UserExpenseCategoryBuilder;
 import com.easyexpenses.api.entities.User;
 import com.easyexpenses.api.entities.UserExpenseCategory;
-import com.easyexpenses.api.repositories.UserExpenseCategoryRepository;
-import com.easyexpenses.api.repositories.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
