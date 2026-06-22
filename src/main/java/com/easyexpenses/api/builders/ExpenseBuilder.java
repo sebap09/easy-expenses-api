@@ -6,6 +6,7 @@ import java.util.Date;
 
 public class ExpenseBuilder {
 
+    private Long id;
     private Date date = new Date();
     private String comment = "Comment";
     private double value = 100.99;
@@ -14,6 +15,11 @@ public class ExpenseBuilder {
     private UserPaymentMethod userPaymentMethod;
     private UserExpenseCategory userExpenseCategory;
     private UserExpenseSubCategory userExpenseSubCategory;
+
+    public ExpenseBuilder id(Long id) {
+        this.id = id;
+        return this;
+    }
 
     public ExpenseBuilder date(Date date) {
         this.date = date;
@@ -52,6 +58,7 @@ public class ExpenseBuilder {
 
     public Expense build() {
         Expense expense = new Expense();
+        expense.setId(id);
         expense.setDate(date);
         expense.setComment(comment);
         expense.setValue(value);

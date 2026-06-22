@@ -6,9 +6,15 @@ import com.easyexpenses.api.entities.UserExpenseSubCategory;
 
 public class UserExpenseSubCategoryBuilder {
 
+    private Long id;
     private String name = "Jedzenie/kosmetyki/chemia/inne";
     private User user;
     private UserExpenseCategory userExpenseCategory;
+
+    public UserExpenseSubCategoryBuilder id(Long id) {
+        this.id = id;
+        return this;
+    }
 
     public UserExpenseSubCategoryBuilder name(String name) {
         this.name = name;
@@ -27,6 +33,7 @@ public class UserExpenseSubCategoryBuilder {
 
     public UserExpenseSubCategory build() {
         UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategory();
+        userExpenseSubCategory.setId(id);
         userExpenseSubCategory.setName(name);
 
         if (user != null) {
