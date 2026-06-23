@@ -7,7 +7,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name="user_expense_sub_category")
+@Table(
+        name = "user_expense_sub_category",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {"userId", "name"}
+                )
+        }
+)
 @Getter
 @Setter
 @AllArgsConstructor
@@ -18,7 +25,7 @@ public class UserExpenseSubCategory {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String name;
 
     @PrePersist

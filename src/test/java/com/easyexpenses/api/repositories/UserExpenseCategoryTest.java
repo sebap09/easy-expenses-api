@@ -69,4 +69,33 @@ public class UserExpenseCategoryTest {
         });
     }
 
+    @Test
+    void shouldAllowTheSameNameForDifferentUsers() {
+        User firstUser = new UserBuilder().build();
+        String name = "Shopping";
+        UserExpenseCategory firstUserExpenseCategory = new UserExpenseCategoryBuilder()
+                .user(firstUser)
+                .name(name)
+                .build();
+
+        userRepository.save(firstUser);
+        userExpenseCategoryRepository.save(firstUserExpenseCategory);
+
+        User secondUser = new UserBuilder().build();
+        UserExpenseCategory secondUserExpenseCategory = new UserExpenseCategoryBuilder()
+                .user(secondUser)
+                .name(name)
+                .build();
+
+        userRepository.save(secondUser);
+        userExpenseCategoryRepository.save(secondUserExpenseCategory);
+
+        em.flush();
+        em.clear();
+
+        UserExpenseCategory firstSavedUserExpenseCategory = userExpenseCategoryRepository.findById(firstUserExpenseCategory.getId()).orElseThrow();
+        UserExpenseCategory secondSavedUserExpenseCategory = userExpenseCategoryRepository.findById(secondUserExpenseCategory.getId()).orElseThrow();
+        assertEquals(name.toUpperCase(), firstSavedUserExpenseCategory.getName());
+        assertEquals(name.toUpperCase(), secondSavedUserExpenseCategory.getName());
+    }
 }
