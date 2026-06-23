@@ -66,4 +66,34 @@ public class UserPaymentMethodTest {
         });
     }
 
+    @Test
+    void shouldAllowTheSameNameForDifferentUsers() {
+        User firstUser = new UserBuilder().build();
+        String name = "Cash";
+        UserPaymentMethod firstUserPaymentMethod = new UserPaymentMethodBuilder()
+                .user(firstUser)
+                .name(name)
+                .build();
+
+        userRepository.save(firstUser);
+        userPaymentMethodRepository.save(firstUserPaymentMethod);
+
+        User secondUser = new UserBuilder().build();
+        UserPaymentMethod secondUserPaymentMethod = new UserPaymentMethodBuilder()
+                .user(secondUser)
+                .name(name)
+                .build();
+
+        userRepository.save(secondUser);
+        userPaymentMethodRepository.save(secondUserPaymentMethod);
+
+        em.flush();
+        em.clear();
+
+        UserPaymentMethod savedFirstUserPaymentMethod = userPaymentMethodRepository.findById(firstUserPaymentMethod.getId()).orElseThrow();
+        UserPaymentMethod savedSecondUserPaymentMethod = userPaymentMethodRepository.findById(secondUserPaymentMethod.getId()).orElseThrow();
+        assertEquals(name.toUpperCase(), savedFirstUserPaymentMethod.getName());
+        assertEquals(name.toUpperCase(), savedSecondUserPaymentMethod.getName());
+    }
+
 }
