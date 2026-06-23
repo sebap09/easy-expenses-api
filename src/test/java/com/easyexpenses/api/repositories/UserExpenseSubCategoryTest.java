@@ -87,4 +87,45 @@ public class UserExpenseSubCategoryTest {
         });
     }
 
+    @Test
+    void shouldAllowTheSameNameForDifferentUsers() {
+        User firstUser = new UserBuilder().build();
+        String name = "Grocery";
+        UserExpenseCategory firstUserExpenseCategory = new UserExpenseCategoryBuilder()
+                .user(firstUser)
+                .name("Shopping")
+                .build();
+        UserExpenseSubCategory firstUserExpenseSubCategory = new UserExpenseSubCategoryBuilder()
+                .user(firstUser)
+                .name(name)
+                .userExpenseCategory(firstUserExpenseCategory)
+                .build();
+
+        userRepository.save(firstUser);
+        userExpenseCategoryRepository.save(firstUserExpenseCategory);
+        userExpenseSubCategoryRepository.save(firstUserExpenseSubCategory);
+
+        User secondUser = new UserBuilder().build();
+        UserExpenseCategory secondUserExpenseCategory = new UserExpenseCategoryBuilder()
+                .user(secondUser)
+                .name("Travel")
+                .build();
+        UserExpenseSubCategory secondUserExpenseSubCategory = new UserExpenseSubCategoryBuilder()
+                .user(secondUser)
+                .name(name)
+                .userExpenseCategory(firstUserExpenseCategory)
+                .build();
+
+        userRepository.save(secondUser);
+        userExpenseCategoryRepository.save(secondUserExpenseCategory);
+        userExpenseSubCategoryRepository.save(secondUserExpenseSubCategory);
+
+        em.flush();
+        em.clear();
+
+        UserExpenseSubCategory firstSavedUserExpenseSubCategory = userExpenseSubCategoryRepository.findById(firstUserExpenseSubCategory.getId()).orElseThrow();
+        UserExpenseSubCategory secondSavedUserExpenseSubCategory = userExpenseSubCategoryRepository.findById(secondUserExpenseSubCategory.getId()).orElseThrow();
+        assertEquals(name.toUpperCase(), firstSavedUserExpenseSubCategory.getName());
+        assertEquals(name.toUpperCase(), secondSavedUserExpenseSubCategory.getName());
+    }
 }
