@@ -1,9 +1,6 @@
 package com.easyexpenses.api.builders;
 
-import com.easyexpenses.api.entities.User;
-import com.easyexpenses.api.entities.UserExpenseCategory;
-import com.easyexpenses.api.entities.UserExpenseSubCategory;
-import com.easyexpenses.api.entities.UserPaymentMethod;
+import com.easyexpenses.api.entities.*;
 import com.easyexpenses.api.fixtures.ExpenseFixture;
 
 public class ExpenseFixtureBuilder {
@@ -11,6 +8,7 @@ public class ExpenseFixtureBuilder {
 
         User user = new UserBuilder()
                 .id(1L)
+                .role(Role.USER)
                 .build();
 
         UserPaymentMethod paymentMethod =
