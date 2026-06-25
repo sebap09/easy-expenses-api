@@ -2,7 +2,6 @@ package com.easyexpenses.api.controllers;
 
 import com.easyexpenses.api.dtos.AddNewExpenseRequest;
 import com.easyexpenses.api.dtos.ExpenseResponse;
-import com.easyexpenses.api.entities.Expense;
 import com.easyexpenses.api.services.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
