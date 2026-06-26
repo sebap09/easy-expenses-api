@@ -30,7 +30,7 @@ public class DevDataInitializer {
     ) {
         return args -> {
             User user = new UserBuilder()
-                     .username("user1")
+                     .username("defaultUser")
                     .build();
 
             UserPaymentMethod card = new UserPaymentMethodBuilder()
