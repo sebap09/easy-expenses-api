@@ -1,34 +1,27 @@
 package com.easyexpenses.api.security;
 
-import com.easyexpenses.api.entities.User;
-import com.easyexpenses.api.repositories.UserRepository;
+import com.easyexpenses.api.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
+    private final UserService userService;
 
-    private final UserRepository userRepository;
-
-
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    @Autowired
+    public CustomUserDetailsService(UserService userService) {
+        this.userService = userService;
     }
-
 
     @Override
     public UserDetails loadUserByUsername(String username) {
+        return new CustomUserDetails(userService.findByUsername(username));
+    }
 
-        User user = userRepository
-                .findByUsername(username)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found")
-                );
-
-
-        return new CustomUserDetails(user);
+    public UserDetails loadUserById(String id) {
+        return new CustomUserDetails(userService.getUser(Long.valueOf(id)));
     }
 }
