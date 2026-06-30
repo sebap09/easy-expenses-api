@@ -16,6 +16,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @Profile("dev")
@@ -26,11 +27,13 @@ public class DevDataInitializer {
             UserRepository userRepository,
             UserPaymentMethodRepository paymentMethodRepository,
             UserExpenseCategoryRepository userExpenseCategoryRepository,
-            UserExpenseSubCategoryRepository userExpenseSubCategoryRepository
+            UserExpenseSubCategoryRepository userExpenseSubCategoryRepository,
+            PasswordEncoder passwordEncoder
     ) {
         return args -> {
             User user = new UserBuilder()
                      .username("defaultUser")
+                    .password(passwordEncoder.encode("password"))
                     .build();
 
             UserPaymentMethod card = new UserPaymentMethodBuilder()
