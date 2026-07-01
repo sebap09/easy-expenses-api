@@ -28,4 +28,8 @@ public class AuthService {
     public RefreshResponse refresh(RefreshRequest refreshRequest){
         return refreshTokenService.refresh(refreshRequest);
     }
+
+    public void revokeToken(RefreshRequest refreshRequest) {
+        refreshTokenService.revoke(refreshRequest);
+    }
 }
