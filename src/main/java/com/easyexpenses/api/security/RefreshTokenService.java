@@ -29,11 +29,14 @@ public class RefreshTokenService {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
-    public RefreshResponse refresh(RefreshRequest refreshRequest){
-        RefreshToken refreshTokenEntity = findByTokenHash(refreshRequest.refreshToken());
-        validate(refreshTokenEntity);
+    public void revoke(RefreshRequest refreshRequest) {
+        findValidateAndRevoke(refreshRequest);
+    }
 
-        GeneratedRefreshToken newRefreshToken = generateRefreshToken(refreshTokenEntity.getUser());
+    public RefreshResponse refresh(RefreshRequest refreshRequest){
+        RefreshToken oldRefreshToken = findValidateAndRevoke(refreshRequest);
+
+        GeneratedRefreshToken newRefreshToken = generateRefreshToken(oldRefreshToken.getUser());
         //Can contain other claims in the future
         JwtGenerationRequest jwtGenerationRequest = new JwtGenerationRequest(
                 newRefreshToken.user().getId().toString());
@@ -58,6 +61,14 @@ public class RefreshTokenService {
 
         refreshTokenRepository.save(refreshToken);
         return new GeneratedRefreshToken(opaqueToken, refreshToken.getUser());
+    }
+
+    private RefreshToken findValidateAndRevoke(RefreshRequest refreshRequest) {
+        RefreshToken refreshToken = findByTokenHash(refreshRequest.refreshToken());
+        validate(refreshToken);
+
+        refreshToken.setRevokedAt(Instant.now());
+        return refreshTokenRepository.save(refreshToken);
     }
 
     private String generateTokenValue(){
