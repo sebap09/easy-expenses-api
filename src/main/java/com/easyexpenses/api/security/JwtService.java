@@ -1,35 +1,53 @@
 package com.easyexpenses.api.security;
 
+import com.easyexpenses.api.config.TokenProperties;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
 @Service
 public class JwtService {
 
-    @Autowired
+    private final TokenProperties tokenProperties;
     private final SecretKey secretKey;
 
-    public JwtService(SecretKey secretKey) {
-        this.secretKey = secretKey;
+    @Autowired
+    public JwtService(TokenProperties tokenProperties) {
+        this.tokenProperties = tokenProperties;
+        this.secretKey = createSecretKey(tokenProperties.secret());
     }
 
-    public String generateToken(JwtGenerationRequest jwtGenerationRequest){
+    public GeneratedJwtToken generateToken(JwtGenerationRequest jwtGenerationRequest){
         Date expiration = Date.from(
-                Instant.now().plus(jwtGenerationRequest.expiresIn())
+                Instant.now().plus(tokenProperties.accessTokenExpiration())
         );
-        return Jwts.builder()
+
+        String token = Jwts.builder()
                 .subject(jwtGenerationRequest.subject())
-                .issuedAt(new Date())
+                .issuedAt(Date.from(Instant.now()))
                 .expiration(expiration)
-                .issuer(jwtGenerationRequest.issuer())
-                .audience().add(jwtGenerationRequest.audience()).and()
+                .issuer(tokenProperties.issuer())
+                .audience().add(tokenProperties.audience()).and()
                 .signWith(secretKey)
                 .compact();
+
+        long expiresIn =
+                Duration.between(
+                        Instant.now(),
+                        expiration.toInstant()
+                ).toSeconds();
+
+        return new GeneratedJwtToken(
+                token,
+                expiresIn
+        );
     }
 
     public String extractSubject(String token) {
@@ -52,7 +70,7 @@ public class JwtService {
 
     public boolean isExpired(String token) {
         Date expiration = extractExpiration(token);
-        return expiration.before(new Date());
+        return expiration.before(Date.from(Instant.now()));
     }
 
     public boolean isValid(String token, CustomUserDetails customUserDetails) {
@@ -60,5 +78,9 @@ public class JwtService {
 
         return subject.equals(customUserDetails.getId().toString())
                 && !isExpired(token);
+    }
+
+    private SecretKey createSecretKey(String secret) {
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 }

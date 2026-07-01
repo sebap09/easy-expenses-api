@@ -49,12 +49,20 @@ public class User {
     @Setter(AccessLevel.NONE)
     private Set<UserExpenseCategory> userExpenseCategories = new HashSet<>();
 
+
     @OneToMany(
             mappedBy="user",
             cascade = CascadeType.REMOVE,
             orphanRemoval = true)
     @Setter(AccessLevel.NONE)
     private Set<UserExpenseSubCategory> userExpenseSubCategories = new HashSet<>();
+
+    @OneToMany(
+            mappedBy="user",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true)
+    @Setter(AccessLevel.NONE)
+    private Set<RefreshToken> userRefreshTokens = new HashSet<>();
 
     public void addNewExpense(Expense expense){
         this.expenses.add(expense);
@@ -74,5 +82,10 @@ public class User {
     public void addNewUserSubCategory(UserExpenseSubCategory userExpenseSubCategory){
         this.userExpenseSubCategories.add(userExpenseSubCategory);
         userExpenseSubCategory.setUser(this);
+    }
+
+    public void addNewUserSession(RefreshToken refreshToken){
+        this.userRefreshTokens.add(refreshToken);
+        refreshToken.setUser(this);
     }
 }

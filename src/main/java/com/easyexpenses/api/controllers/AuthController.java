@@ -1,9 +1,6 @@
 package com.easyexpenses.api.controllers;
 
-import com.easyexpenses.api.dtos.AuthRequest;
-import com.easyexpenses.api.dtos.AuthResponse;
-import com.easyexpenses.api.dtos.RegistrationRequest;
-import com.easyexpenses.api.dtos.RegistrationResponse;
+import com.easyexpenses.api.dtos.*;
 import com.easyexpenses.api.security.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,5 +28,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
         return new ResponseEntity<>(authService.authenticate(authRequest), HttpStatus.OK);
+    }
+
+    // POST http://localhost:8080/api/v1/auth/refresh
+    @PostMapping("/refresh")
+    public ResponseEntity<RefreshResponse> refresh(@RequestBody RefreshRequest refreshRequest) {
+        return new ResponseEntity<>(authService.refresh(refreshRequest), HttpStatus.OK);
     }
 }
