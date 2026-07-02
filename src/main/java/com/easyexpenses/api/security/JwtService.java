@@ -1,9 +1,12 @@
 package com.easyexpenses.api.security;
 
 import com.easyexpenses.api.config.TokenProperties;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -51,26 +54,28 @@ public class JwtService {
     }
 
     public String extractSubject(String token) {
-        return Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
-    }
-
-    private Date extractExpiration(String token) {
-        return Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getExpiration();
+        return tryExtractClaims(token).getSubject();
     }
 
     public boolean isExpired(String token) {
         Date expiration = extractExpiration(token);
         return expiration.before(Date.from(Instant.now()));
+    }
+
+    private Date extractExpiration(String token) {
+        return tryExtractClaims(token).getExpiration();
+    }
+
+    private Claims tryExtractClaims(String token) {
+        try{
+            return Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        }catch (JwtException ex){
+            throw new BadCredentialsException("Invalid auth token provided!");
+        }
     }
 
     public boolean isValid(String token, CustomUserDetails customUserDetails) {
