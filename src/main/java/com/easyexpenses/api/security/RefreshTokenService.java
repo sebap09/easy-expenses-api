@@ -4,6 +4,7 @@ import com.easyexpenses.api.builders.RefreshTokenBuilder;
 import com.easyexpenses.api.config.TokenProperties;
 import com.easyexpenses.api.dtos.RefreshRequest;
 import com.easyexpenses.api.dtos.RefreshResponse;
+import com.easyexpenses.api.dtos.RevokeRequest;
 import com.easyexpenses.api.entities.RefreshToken;
 import com.easyexpenses.api.entities.User;
 import com.easyexpenses.api.repositories.RefreshTokenRepository;
@@ -29,12 +30,12 @@ public class RefreshTokenService {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
-    public void revoke(RefreshRequest refreshRequest) {
-        findValidateAndRevoke(refreshRequest);
+    public void revoke(RevokeRequest revokeRequest) {
+        findValidateAndRevoke(revokeRequest.refreshToken());
     }
 
     public RefreshResponse refresh(RefreshRequest refreshRequest){
-        RefreshToken oldRefreshToken = findValidateAndRevoke(refreshRequest);
+        RefreshToken oldRefreshToken = findValidateAndRevoke(refreshRequest.refreshToken());
 
         GeneratedRefreshToken newRefreshToken = generateRefreshToken(oldRefreshToken.getUser());
         //Can contain other claims in the future
@@ -63,8 +64,8 @@ public class RefreshTokenService {
         return new GeneratedRefreshToken(opaqueToken, refreshToken.getUser());
     }
 
-    private RefreshToken findValidateAndRevoke(RefreshRequest refreshRequest) {
-        RefreshToken refreshToken = findByTokenHash(refreshRequest.refreshToken());
+    private RefreshToken findValidateAndRevoke(String token) {
+        RefreshToken refreshToken = findByTokenHash(token);
         validate(refreshToken);
 
         refreshToken.setRevokedAt(Instant.now());
