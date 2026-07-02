@@ -29,7 +29,7 @@ public class AuthService {
         return refreshTokenService.refresh(refreshRequest);
     }
 
-    public void revokeToken(RefreshRequest refreshRequest) {
-        refreshTokenService.revoke(refreshRequest);
+    public void revokeToken(RevokeRequest revokeRequest) {
+        refreshTokenService.revoke(revokeRequest);
     }
 }

@@ -38,8 +38,8 @@ public class AuthController {
 
     // POST http://localhost:8080/api/v1/auth/revoke
     @PostMapping("/revoke")
-    public ResponseEntity<Void> revoke(@RequestBody RefreshRequest refreshRequest) {
-        authService.revokeToken(refreshRequest);
+    public ResponseEntity<Void> revoke(@RequestBody RevokeRequest revokeRequest) {
+        authService.revokeToken(revokeRequest);
         return ResponseEntity.noContent().build();
     }
 }
