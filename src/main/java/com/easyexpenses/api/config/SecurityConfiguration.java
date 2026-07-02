@@ -38,8 +38,8 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService, CustomUserDetailsService customUserDetailsService) {
-        return new JwtAuthenticationFilter(jwtService, customUserDetailsService);
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService, CustomUserDetailsService customUserDetailsService, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+        return new JwtAuthenticationFilter(jwtService, customUserDetailsService, customAuthenticationEntryPoint);
     }
 
     @Bean
