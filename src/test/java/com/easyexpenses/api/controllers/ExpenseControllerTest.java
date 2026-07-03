@@ -252,4 +252,47 @@ public class ExpenseControllerTest {
         verify(expenseService)
                 .addNewExpense(addNewExpenseRequest);
     }
+
+    @Test
+    void shouldReturn400WhenNoBodyProvided() throws Exception {
+        mockMvc.perform(
+                        post(EXPENSES_ENDPOINT)
+                )
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.detail").value("Request body is missing"))
+                .andExpect(jsonPath("$.instance").value(EXPENSES_ENDPOINT))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.title").value("Bad Request"));
+    }
+
+    @Test
+    void shouldReturn400WhenWrongBodyParametersProvided() throws Exception {
+        mockMvc.perform(
+                        post(EXPENSES_ENDPOINT)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                          "XuserId": 2,
+                                          "XcategoryId": 1,
+                                          "XsubCategoryId": 1,
+                                          "XuserPaymentMethodId": 1,
+                                          "Xdate": "2026-04-17",
+                                          "Xvalue": 100.19,
+                                          "Xcomment": "comment"
+                                        }
+                                        """)
+                )
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.detail").value("Request contains invalid fields"))
+                .andExpect(jsonPath("$.errors.userId").value("must not be null"))
+                .andExpect(jsonPath("$.errors.categoryId").value("must not be null"))
+                .andExpect(jsonPath("$.errors.subCategoryId").value("must not be null"))
+                .andExpect(jsonPath("$.errors.userPaymentMethodId").value("must not be null"))
+                .andExpect(jsonPath("$.errors.date").value("must not be null"))
+                .andExpect(jsonPath("$.errors.value").value("must not be null"))
+                .andExpect(jsonPath("$.errors.comment").value("must not be blank"))
+                .andExpect(jsonPath("$.instance").value(EXPENSES_ENDPOINT))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.title").value("Bad Request"));
+    }
 }

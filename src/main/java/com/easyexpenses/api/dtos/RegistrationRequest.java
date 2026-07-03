@@ -1,4 +1,9 @@
 package com.easyexpenses.api.dtos;
 
-public record RegistrationRequest(String username, String rawPassword) {
+import jakarta.validation.constraints.NotBlank;
+
+public record RegistrationRequest(
+        @NotBlank String username,
+        @NotBlank String rawPassword
+) {
 }
