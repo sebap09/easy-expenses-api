@@ -1,4 +1,8 @@
 package com.easyexpenses.api.dtos;
 
-public record RevokeRequest(String refreshToken) {
+import jakarta.validation.constraints.NotBlank;
+
+public record RevokeRequest(
+        @NotBlank String refreshToken
+) {
 }
