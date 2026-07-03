@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -19,22 +20,24 @@ import java.util.Date;
 public class JwtService {
 
     private final TokenProperties tokenProperties;
+    private final Clock clock;
     private final SecretKey secretKey;
 
     @Autowired
-    public JwtService(TokenProperties tokenProperties) {
+    public JwtService(TokenProperties tokenProperties, Clock clock) {
         this.tokenProperties = tokenProperties;
         this.secretKey = createSecretKey(tokenProperties.secret());
+        this.clock = clock;
     }
 
     public GeneratedJwtToken generateToken(JwtGenerationRequest jwtGenerationRequest){
         Date expiration = Date.from(
-                Instant.now().plus(tokenProperties.accessTokenExpiration())
+                Instant.now(clock).plus(tokenProperties.accessTokenExpiration())
         );
 
         String token = Jwts.builder()
                 .subject(jwtGenerationRequest.subject())
-                .issuedAt(Date.from(Instant.now()))
+                .issuedAt(Date.from(Instant.now(clock)))
                 .expiration(expiration)
                 .issuer(tokenProperties.issuer())
                 .audience().add(tokenProperties.audience()).and()
@@ -43,7 +46,7 @@ public class JwtService {
 
         long expiresIn =
                 Duration.between(
-                        Instant.now(),
+                        Instant.now(clock),
                         expiration.toInstant()
                 ).toSeconds();
 
@@ -59,7 +62,7 @@ public class JwtService {
 
     public boolean isExpired(String token) {
         Date expiration = extractExpiration(token);
-        return expiration.before(Date.from(Instant.now()));
+        return expiration.before(Date.from(Instant.now(clock)));
     }
 
     private Date extractExpiration(String token) {
