@@ -1,13 +1,13 @@
 package com.easyexpenses.api.builders;
 
-import com.easyexpenses.api.entities.User;
+import com.easyexpenses.api.entities.UserProfile;
 import com.easyexpenses.api.entities.UserExpenseCategory;
 
 public class UserExpenseCategoryBuilder {
 
     private Long id;
     private String name = "Zakupy";
-    private User user;
+    private UserProfile userProfile;
 
     public UserExpenseCategoryBuilder id(Long id) {
         this.id = id;
@@ -19,8 +19,8 @@ public class UserExpenseCategoryBuilder {
         return this;
     }
 
-    public UserExpenseCategoryBuilder user(User user) {
-        this.user = user;
+    public UserExpenseCategoryBuilder userProfile(UserProfile userProfile) {
+        this.userProfile = userProfile;
         return this;
     }
 
@@ -29,8 +29,8 @@ public class UserExpenseCategoryBuilder {
         userExpenseCategory.setId(id);
         userExpenseCategory.setName(name);
 
-        if (user != null) {
-            user.addNewUserCategory(userExpenseCategory);
+        if (userProfile != null) {
+            userProfile.addNewUserCategory(userExpenseCategory);
         }
         return userExpenseCategory;
     }

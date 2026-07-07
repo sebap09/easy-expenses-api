@@ -3,7 +3,7 @@ package com.easyexpenses.api.services;
 import com.easyexpenses.api.builders.*;
 import com.easyexpenses.api.dtos.AddNewExpenseRequest;
 import com.easyexpenses.api.entities.Expense;
-import com.easyexpenses.api.entities.User;
+import com.easyexpenses.api.entities.UserProfile;
 import com.easyexpenses.api.entities.UserExpenseCategory;
 import com.easyexpenses.api.entities.UserPaymentMethod;
 import com.easyexpenses.api.errors.ErrorCode;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 public class ExpenseServiceTest {
 
     @Mock
-    private UserService userService;
+    private UserProfileService userProfileService;
 
     @Mock
     private UserPaymentMethodService userPaymentMethodService;
@@ -52,12 +52,12 @@ public class ExpenseServiceTest {
     void shouldThrowExceptionWhenUserIdIsNotConsistentAcrossDomain() {
         ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
 
-        User anotherUser = new UserBuilder()
+        UserProfile anotherUser = new UserProfileBuilder()
                 .id(2L)
                 .build();
         UserPaymentMethod anotherUserPaymentMethod = new UserPaymentMethodBuilder()
                 .id(2L)
-                .user(anotherUser)
+                .userProfile(anotherUser)
                 .build();
 
 
@@ -72,10 +72,10 @@ public class ExpenseServiceTest {
         );
 
         //mocks behavior definition
-        when(userService.getUser(addNewExpenseRequest.userId()))
+        when(userProfileService.getUserProfile(addNewExpenseRequest.userId()))
                 .thenReturn(expenseFixture.getUser());
 
-        //wrong user payment method
+        //wrong userProfile payment method
         when(userPaymentMethodService.getUserPaymentMethod(addNewExpenseRequest.userPaymentMethodId()))
                 .thenReturn(anotherUserPaymentMethod);
 
@@ -113,7 +113,7 @@ public class ExpenseServiceTest {
         );
 
         //mocks behavior definition
-        when(userService.getUser(addNewExpenseRequest.userId()))
+        when(userProfileService.getUserProfile(addNewExpenseRequest.userId()))
                 .thenReturn(expenseFixture.getUser());
 
         when(userPaymentMethodService.getUserPaymentMethod(addNewExpenseRequest.userPaymentMethodId()))
@@ -135,7 +135,7 @@ public class ExpenseServiceTest {
         ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
         UserExpenseCategory anotherCategory = new UserExpenseCategoryBuilder()
                 .id(2L)
-                .user(expenseFixture.getUser())
+                .userProfile(expenseFixture.getUser())
                 .build();
 
 
@@ -150,13 +150,13 @@ public class ExpenseServiceTest {
         );
 
         //mocks behavior definition
-        when(userService.getUser(addNewExpenseRequest.userId()))
+        when(userProfileService.getUserProfile(addNewExpenseRequest.userId()))
                 .thenReturn(expenseFixture.getUser());
 
         when(userPaymentMethodService.getUserPaymentMethod(addNewExpenseRequest.userPaymentMethodId()))
                 .thenReturn(expenseFixture.getUserPaymentMethod());
 
-        //wrong user category
+        //wrong userProfile category
         when(userExpenseCategoryService.getUserExpenseCategory(addNewExpenseRequest.categoryId()))
                 .thenReturn(anotherCategory);
 

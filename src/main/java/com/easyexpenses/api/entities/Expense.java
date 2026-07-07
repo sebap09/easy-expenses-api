@@ -19,7 +19,7 @@ public class Expense {
 
     @ManyToOne
     @JoinColumn(name="userId", nullable=false)
-    private User user;
+    private UserProfile user;
 
     @ManyToOne
     @JoinColumn(name="userPaymentMethodId", nullable=false)
