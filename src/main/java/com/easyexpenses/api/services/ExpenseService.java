@@ -17,16 +17,16 @@ import java.util.Objects;
 @Service
 public class ExpenseService {
     private final ExpenseRepository expenseRepository;
-    private final UserService userService;
+    private final UserProfileService userProfileService;
     private final UserPaymentMethodService userPaymentMethodService;
     private final UserExpenseCategoryService userExpenseCategoryService;
     private final UserExpenseSubCategoryService userExpenseSubCategoryService;
     private final ExpenseMapper expenseMapper;
 
     @Autowired
-    public ExpenseService(ExpenseRepository expenseRepository, UserService userService, UserPaymentMethodService userPaymentMethodService, UserExpenseCategoryService userExpenseCategoryService, UserExpenseSubCategoryService userExpenseSubCategoryService, ExpenseMapper expenseMapper) {
+    public ExpenseService(ExpenseRepository expenseRepository, UserProfileService userProfileService, UserPaymentMethodService userPaymentMethodService, UserExpenseCategoryService userExpenseCategoryService, UserExpenseSubCategoryService userExpenseSubCategoryService, ExpenseMapper expenseMapper) {
         this.expenseRepository = expenseRepository;
-        this.userService = userService;
+        this.userProfileService = userProfileService;
         this.userPaymentMethodService = userPaymentMethodService;
         this.userExpenseCategoryService = userExpenseCategoryService;
         this.userExpenseSubCategoryService = userExpenseSubCategoryService;
@@ -41,15 +41,15 @@ public class ExpenseService {
     }
 
     public ExpenseResponse addNewExpense(AddNewExpenseRequest addNewExpenseRequest) {
-        User user = userService.getUser(addNewExpenseRequest.userId());
+        UserProfile userProfile = userProfileService.getUserProfile(addNewExpenseRequest.userId());
         UserPaymentMethod userPaymentMethod = userPaymentMethodService.getUserPaymentMethod(addNewExpenseRequest.userPaymentMethodId());
         UserExpenseCategory userExpenseCategory = userExpenseCategoryService.getUserExpenseCategory(addNewExpenseRequest.categoryId());
         UserExpenseSubCategory userExpenseSubCategory = userExpenseSubCategoryService.getUserExpenseSubCategory(addNewExpenseRequest.subCategoryId());
 
-        validateDomainConstraints(user, userPaymentMethod, userExpenseCategory, userExpenseSubCategory);
+        validateDomainConstraints(userProfile, userPaymentMethod, userExpenseCategory, userExpenseSubCategory);
 
         Expense expense = new ExpenseBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .userPaymentMethod(userPaymentMethod)
                 .userExpenseCategory(userExpenseCategory)
                 .userExpenseSubCategory(userExpenseSubCategory)
@@ -62,12 +62,12 @@ public class ExpenseService {
     }
 
     private boolean isUserIdConsistentAcrossDomain(
-            User user,
+            UserProfile userProfile,
             UserPaymentMethod userPaymentMethod,
             UserExpenseCategory userExpenseCategory,
             UserExpenseSubCategory userExpenseSubCategory
     ) {
-        Long userId = user.getId();
+        Long userId = userProfile.getId();
         return Objects.equals(userId, userPaymentMethod.getUser().getId()) &&
                 Objects.equals(userId, userExpenseCategory.getUser().getId()) &&
                 Objects.equals(userId, userExpenseSubCategory.getUser().getId());
@@ -81,13 +81,13 @@ public class ExpenseService {
     }
 
     private void validateDomainConstraints(
-            User user,
+            UserProfile userProfile,
             UserPaymentMethod userPaymentMethod,
             UserExpenseCategory userExpenseCategory,
             UserExpenseSubCategory userExpenseSubCategory
     ){
         if(!isUserIdConsistentAcrossDomain(
-                user,
+                userProfile,
                 userPaymentMethod,
                 userExpenseCategory,
                 userExpenseSubCategory))

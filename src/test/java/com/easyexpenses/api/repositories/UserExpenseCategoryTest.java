@@ -1,8 +1,8 @@
 package com.easyexpenses.api.repositories;
 
-import com.easyexpenses.api.builders.UserBuilder;
+import com.easyexpenses.api.builders.UserProfileBuilder;
 import com.easyexpenses.api.builders.UserExpenseCategoryBuilder;
-import com.easyexpenses.api.entities.User;
+import com.easyexpenses.api.entities.UserProfile;
 import com.easyexpenses.api.entities.UserExpenseCategory;
 import jakarta.persistence.EntityManager;
 import org.hibernate.exception.ConstraintViolationException;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class UserExpenseCategoryTest {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserProfileRepository userProfileRepository;
 
     @Autowired
     private UserExpenseCategoryRepository userExpenseCategoryRepository;
@@ -27,14 +27,14 @@ public class UserExpenseCategoryTest {
 
     @Test
     void shouldConvertNameToUppercase() {
-        User user = new UserBuilder().build();
+        UserProfile userProfile = new UserProfileBuilder().build();
         String name = "Shopping";
         UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .name(name)
                 .build();
 
-        userRepository.save(user);
+        userProfileRepository.save(userProfile);
         userExpenseCategoryRepository.save(userExpenseCategory);
 
         UserExpenseCategory savedUserExpenseCategory = userExpenseCategoryRepository.findById(userExpenseCategory.getId()).orElseThrow();
@@ -44,21 +44,21 @@ public class UserExpenseCategoryTest {
     @Test
     void shouldThrowExceptionWhenNameIsNotUnique() {
         //entities & relationships data
-        User user = new UserBuilder().build();
+        UserProfile userProfile = new UserProfileBuilder().build();
         String name = "Shopping";
         UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .name(name)
                 .build();
 
-        userRepository.save(user);
+        userProfileRepository.save(userProfile);
         userExpenseCategoryRepository.save(userExpenseCategory);
 
         em.flush();
         em.clear();
 
         UserExpenseCategory duplicateUserExpenseCategory = new UserExpenseCategoryBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .name(name)
                 .build();
 
@@ -71,23 +71,23 @@ public class UserExpenseCategoryTest {
 
     @Test
     void shouldAllowTheSameNameForDifferentUsers() {
-        User firstUser = new UserBuilder().build();
+        UserProfile firstUser = new UserProfileBuilder().build();
         String name = "Shopping";
         UserExpenseCategory firstUserExpenseCategory = new UserExpenseCategoryBuilder()
-                .user(firstUser)
+                .userProfile(firstUser)
                 .name(name)
                 .build();
 
-        userRepository.save(firstUser);
+        userProfileRepository.save(firstUser);
         userExpenseCategoryRepository.save(firstUserExpenseCategory);
 
-        User secondUser = new UserBuilder().build();
+        UserProfile secondUser = new UserProfileBuilder().build();
         UserExpenseCategory secondUserExpenseCategory = new UserExpenseCategoryBuilder()
-                .user(secondUser)
+                .userProfile(secondUser)
                 .name(name)
                 .build();
 
-        userRepository.save(secondUser);
+        userProfileRepository.save(secondUser);
         userExpenseCategoryRepository.save(secondUserExpenseCategory);
 
         em.flush();

@@ -36,7 +36,7 @@ public class UserPaymentMethod {
 
     @ManyToOne
     @JoinColumn(name="userId", nullable=false)
-    private User user;
+    private UserProfile user;
 
     @OneToMany(mappedBy="userPaymentMethod")
     @Setter(AccessLevel.NONE)

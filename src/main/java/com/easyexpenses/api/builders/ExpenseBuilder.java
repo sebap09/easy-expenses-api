@@ -11,7 +11,7 @@ public class ExpenseBuilder {
     private String comment = "Comment";
     private double value = 100.99;
 
-    private User user;
+    private UserProfile userProfile;
     private UserPaymentMethod userPaymentMethod;
     private UserExpenseCategory userExpenseCategory;
     private UserExpenseSubCategory userExpenseSubCategory;
@@ -36,8 +36,8 @@ public class ExpenseBuilder {
         return this;
     }
 
-    public ExpenseBuilder user(User user) {
-        this.user = user;
+    public ExpenseBuilder userProfile(UserProfile userProfile) {
+        this.userProfile = userProfile;
         return this;
     }
 
@@ -63,8 +63,8 @@ public class ExpenseBuilder {
         expense.setComment(comment);
         expense.setValue(value);
 
-        if (user != null) {
-            user.addNewExpense(expense);
+        if (userProfile != null) {
+            userProfile.addNewExpense(expense);
         }
 
         if (userPaymentMethod != null) {

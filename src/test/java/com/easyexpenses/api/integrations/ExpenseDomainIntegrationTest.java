@@ -17,7 +17,7 @@ public class ExpenseDomainIntegrationTest {
     private ExpenseRepository expenseRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserProfileRepository userProfileRepository;
 
     @Autowired
     private UserPaymentMethodRepository userPaymentMethodRepository;
@@ -35,30 +35,30 @@ public class ExpenseDomainIntegrationTest {
     @Test
     void shouldPersistExpenseWithDomain() {
         //entities & relationships data
-        User user = new UserBuilder().build();
+        UserProfile userProfile = new UserProfileBuilder().build();
 
         UserPaymentMethod userPaymentMethod = new UserPaymentMethodBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .build();
 
         UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .build();
 
         UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategoryBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .userExpenseCategory(userExpenseCategory)
                 .build();
 
         Expense expense = new ExpenseBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .userPaymentMethod(userPaymentMethod)
                 .userExpenseCategory(userExpenseCategory)
                 .userExpenseSubCategory(userExpenseSubCategory)
                 .build();
 
         //saving entities to db
-        userRepository.save(user);
+        userProfileRepository.save(userProfile);
         userPaymentMethodRepository.save(userPaymentMethod);
         userExpenseCategoryRepository.save(userExpenseCategory);
         userExpenseSubCategoryRepository.save(userExpenseSubCategory);
@@ -72,14 +72,14 @@ public class ExpenseDomainIntegrationTest {
 
         //expense data is persisted correctly
         assertEquals(expense.getValue(), savedExpense.getValue());
-        //user payment method data is persisted correctly
+        //userProfile payment method data is persisted correctly
         assertEquals(userPaymentMethod.getName(), savedExpense.getUserPaymentMethod().getName());
-        //user expense category data is persisted correctly
+        //userProfile expense category data is persisted correctly
         assertEquals(userExpenseCategory.getName(), savedExpense.getUserExpenseCategory().getName());
-        //user expense sub category data is persisted correctly
+        //userProfile expense sub category data is persisted correctly
         assertEquals(userExpenseSubCategory.getName(), savedExpense.getUserExpenseSubCategory().getName());
-        //user data is persisted correctly
-        assertEquals(user.getUsername(), savedExpense.getUser().getUsername());
+        //userProfile data is persisted correctly
+        assertEquals(userProfile.getId(), savedExpense.getUser().getId());
 
         //8
         //OneToMany mappings, remember to not use equals (since the hash is not the same)
@@ -173,42 +173,42 @@ public class ExpenseDomainIntegrationTest {
 
     @Test
     void shouldPersistMultipleExpensesUsingDifferentUserPaymentMethods() {
-        User user = new UserBuilder().build();
+        UserProfile userProfile = new UserProfileBuilder().build();
 
         UserPaymentMethod card = new UserPaymentMethodBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .name("CARD")
                 .build();
 
         UserPaymentMethod cash = new UserPaymentMethodBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .name("CASH")
                 .build();
 
         UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .build();
 
         UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategoryBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .userExpenseCategory(userExpenseCategory)
                 .build();
 
         Expense cardExpense = new ExpenseBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .userPaymentMethod(card)
                 .userExpenseCategory(userExpenseCategory)
                 .userExpenseSubCategory(userExpenseSubCategory)
                 .build();
 
         Expense cashExpense = new ExpenseBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .userPaymentMethod(cash)
                 .userExpenseCategory(userExpenseCategory)
                 .userExpenseSubCategory(userExpenseSubCategory)
                 .build();
 
-        userRepository.save(user);
+        userProfileRepository.save(userProfile);
         userPaymentMethodRepository.save(card);
         userPaymentMethodRepository.save(cash);
         userExpenseCategoryRepository.save(userExpenseCategory);

@@ -1,6 +1,6 @@
 package com.easyexpenses.api.builders;
 
-import com.easyexpenses.api.entities.User;
+import com.easyexpenses.api.entities.UserProfile;
 import com.easyexpenses.api.entities.UserExpenseCategory;
 import com.easyexpenses.api.entities.UserExpenseSubCategory;
 
@@ -8,7 +8,7 @@ public class UserExpenseSubCategoryBuilder {
 
     private Long id;
     private String name = "Jedzenie/kosmetyki/chemia/inne";
-    private User user;
+    private UserProfile userProfile;
     private UserExpenseCategory userExpenseCategory;
 
     public UserExpenseSubCategoryBuilder id(Long id) {
@@ -21,8 +21,8 @@ public class UserExpenseSubCategoryBuilder {
         return this;
     }
 
-    public UserExpenseSubCategoryBuilder user(User user) {
-        this.user = user;
+    public UserExpenseSubCategoryBuilder userProfile(UserProfile userProfile) {
+        this.userProfile = userProfile;
         return this;
     }
 
@@ -36,8 +36,8 @@ public class UserExpenseSubCategoryBuilder {
         userExpenseSubCategory.setId(id);
         userExpenseSubCategory.setName(name);
 
-        if (user != null) {
-            user.addNewUserSubCategory(userExpenseSubCategory);
+        if (userProfile != null) {
+            userProfile.addNewUserSubCategory(userExpenseSubCategory);
         }
 
         if (userExpenseCategory != null) {

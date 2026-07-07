@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class UserPaymentMethodTest {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserProfileRepository userProfileRepository;
 
     @Autowired
     private UserPaymentMethodRepository userPaymentMethodRepository;
@@ -25,14 +25,14 @@ public class UserPaymentMethodTest {
 
     @Test
     void shouldConvertNameToUppercase() {
-        User user = new UserBuilder().build();
+        UserProfile userProfile = new UserProfileBuilder().build();
         String name = "Cash";
         UserPaymentMethod userPaymentMethod = new UserPaymentMethodBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .name(name)
                 .build();
 
-        userRepository.save(user);
+        userProfileRepository.save(userProfile);
         userPaymentMethodRepository.save(userPaymentMethod);
 
         UserPaymentMethod savedUserPaymentMethod = userPaymentMethodRepository.findById(userPaymentMethod.getId()).orElseThrow();
@@ -41,21 +41,21 @@ public class UserPaymentMethodTest {
 
     @Test
     void shouldThrowExceptionWhenNameIsNotUnique() {
-        User user = new UserBuilder().build();
+        UserProfile userProfile = new UserProfileBuilder().build();
         String name = "Cash";
         UserPaymentMethod userPaymentMethod = new UserPaymentMethodBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .name(name)
                 .build();
 
-        userRepository.save(user);
+        userProfileRepository.save(userProfile);
         userPaymentMethodRepository.save(userPaymentMethod);
 
         em.flush();
         em.clear();
 
         UserPaymentMethod duplicateUserPaymentMethod = new UserPaymentMethodBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .name(name)
                 .build();
 
@@ -68,23 +68,23 @@ public class UserPaymentMethodTest {
 
     @Test
     void shouldAllowTheSameNameForDifferentUsers() {
-        User firstUser = new UserBuilder().build();
+        UserProfile firstUser = new UserProfileBuilder().build();
         String name = "Cash";
         UserPaymentMethod firstUserPaymentMethod = new UserPaymentMethodBuilder()
-                .user(firstUser)
+                .userProfile(firstUser)
                 .name(name)
                 .build();
 
-        userRepository.save(firstUser);
+        userProfileRepository.save(firstUser);
         userPaymentMethodRepository.save(firstUserPaymentMethod);
 
-        User secondUser = new UserBuilder().build();
+        UserProfile secondUser = new UserProfileBuilder().build();
         UserPaymentMethod secondUserPaymentMethod = new UserPaymentMethodBuilder()
-                .user(secondUser)
+                .userProfile(secondUser)
                 .name(name)
                 .build();
 
-        userRepository.save(secondUser);
+        userProfileRepository.save(secondUser);
         userPaymentMethodRepository.save(secondUserPaymentMethod);
 
         em.flush();

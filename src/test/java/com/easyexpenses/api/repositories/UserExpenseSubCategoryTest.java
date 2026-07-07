@@ -1,9 +1,9 @@
 package com.easyexpenses.api.repositories;
 
-import com.easyexpenses.api.builders.UserBuilder;
+import com.easyexpenses.api.builders.UserProfileBuilder;
 import com.easyexpenses.api.builders.UserExpenseCategoryBuilder;
 import com.easyexpenses.api.builders.UserExpenseSubCategoryBuilder;
-import com.easyexpenses.api.entities.User;
+import com.easyexpenses.api.entities.UserProfile;
 import com.easyexpenses.api.entities.UserExpenseCategory;
 import com.easyexpenses.api.entities.UserExpenseSubCategory;
 import jakarta.persistence.EntityManager;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class UserExpenseSubCategoryTest {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserProfileRepository userProfileRepository;
 
     @Autowired
     private UserExpenseCategoryRepository userExpenseCategoryRepository;
@@ -32,19 +32,19 @@ public class UserExpenseSubCategoryTest {
 
     @Test
     void shouldConvertNameToUppercase() {
-        User user = new UserBuilder().build();
+        UserProfile userProfile = new UserProfileBuilder().build();
         String name = "Grocery";
         UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .name("Shopping")
                 .build();
         UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategoryBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .name(name)
                 .userExpenseCategory(userExpenseCategory)
                 .build();
 
-        userRepository.save(user);
+        userProfileRepository.save(userProfile);
         userExpenseCategoryRepository.save(userExpenseCategory);
         userExpenseSubCategoryRepository.save(userExpenseSubCategory);
 
@@ -55,19 +55,19 @@ public class UserExpenseSubCategoryTest {
     @Test
     void shouldThrowExceptionWhenNameIsNotUnique() {
         //entities & relationships data
-        User user = new UserBuilder().build();
+        UserProfile userProfile = new UserProfileBuilder().build();
         String name = "Grocery";
         UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .name("Shopping")
                 .build();
         UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategoryBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .name(name)
                 .userExpenseCategory(userExpenseCategory)
                 .build();
 
-        userRepository.save(user);
+        userProfileRepository.save(userProfile);
         userExpenseCategoryRepository.save(userExpenseCategory);
         userExpenseSubCategoryRepository.save(userExpenseSubCategory);
 
@@ -75,7 +75,7 @@ public class UserExpenseSubCategoryTest {
         em.clear();
 
         UserExpenseSubCategory duplicateUserExpenseSubCategory = new UserExpenseSubCategoryBuilder()
-                .user(user)
+                .userProfile(userProfile)
                 .name(name)
                 .userExpenseCategory(userExpenseCategory)
                 .build();
@@ -89,34 +89,34 @@ public class UserExpenseSubCategoryTest {
 
     @Test
     void shouldAllowTheSameNameForDifferentUsers() {
-        User firstUser = new UserBuilder().build();
+        UserProfile firstUser = new UserProfileBuilder().build();
         String name = "Grocery";
         UserExpenseCategory firstUserExpenseCategory = new UserExpenseCategoryBuilder()
-                .user(firstUser)
+                .userProfile(firstUser)
                 .name("Shopping")
                 .build();
         UserExpenseSubCategory firstUserExpenseSubCategory = new UserExpenseSubCategoryBuilder()
-                .user(firstUser)
+                .userProfile(firstUser)
                 .name(name)
                 .userExpenseCategory(firstUserExpenseCategory)
                 .build();
 
-        userRepository.save(firstUser);
+        userProfileRepository.save(firstUser);
         userExpenseCategoryRepository.save(firstUserExpenseCategory);
         userExpenseSubCategoryRepository.save(firstUserExpenseSubCategory);
 
-        User secondUser = new UserBuilder().build();
+        UserProfile secondUser = new UserProfileBuilder().build();
         UserExpenseCategory secondUserExpenseCategory = new UserExpenseCategoryBuilder()
-                .user(secondUser)
+                .userProfile(secondUser)
                 .name("Travel")
                 .build();
         UserExpenseSubCategory secondUserExpenseSubCategory = new UserExpenseSubCategoryBuilder()
-                .user(secondUser)
+                .userProfile(secondUser)
                 .name(name)
                 .userExpenseCategory(firstUserExpenseCategory)
                 .build();
 
-        userRepository.save(secondUser);
+        userProfileRepository.save(secondUser);
         userExpenseCategoryRepository.save(secondUserExpenseCategory);
         userExpenseSubCategoryRepository.save(secondUserExpenseSubCategory);
 
