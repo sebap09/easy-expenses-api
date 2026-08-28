@@ -53,7 +53,7 @@ public class ExpenseServiceTest {
         ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
 
         UserProfile anotherUser = new UserProfileBuilder()
-                .id(2L)
+                .user(2L)
                 .build();
         UserPaymentMethod anotherUserPaymentMethod = new UserPaymentMethodBuilder()
                 .id(2L)

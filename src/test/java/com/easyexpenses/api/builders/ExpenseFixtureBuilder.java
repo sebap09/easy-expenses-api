@@ -7,7 +7,7 @@ public class ExpenseFixtureBuilder {
     public ExpenseFixture build() {
 
         UserProfile userProfile = new UserProfileBuilder()
-                .id(1L)
+                .user(1L)
                 .build();
 
         UserPaymentMethod paymentMethod =

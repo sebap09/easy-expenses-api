@@ -1,17 +1,8 @@
 package com.easyexpenses.api.config;
 
-import com.easyexpenses.api.builders.UserProfileBuilder;
-import com.easyexpenses.api.builders.UserExpenseCategoryBuilder;
-import com.easyexpenses.api.builders.UserExpenseSubCategoryBuilder;
-import com.easyexpenses.api.builders.UserPaymentMethodBuilder;
-import com.easyexpenses.api.entities.UserProfile;
-import com.easyexpenses.api.entities.UserExpenseCategory;
-import com.easyexpenses.api.entities.UserExpenseSubCategory;
-import com.easyexpenses.api.entities.UserPaymentMethod;
-import com.easyexpenses.api.repositories.UserExpenseCategoryRepository;
-import com.easyexpenses.api.repositories.UserExpenseSubCategoryRepository;
-import com.easyexpenses.api.repositories.UserPaymentMethodRepository;
-import com.easyexpenses.api.repositories.UserProfileRepository;
+import com.easyexpenses.api.builders.*;
+import com.easyexpenses.api.entities.*;
+import com.easyexpenses.api.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,13 +14,19 @@ public class DevDataInitializer {
 
     @Bean
     CommandLineRunner init(
-            UserProfileRepository userProfileRepository,
+            UserRepository userRepository,
             UserPaymentMethodRepository paymentMethodRepository,
             UserExpenseCategoryRepository userExpenseCategoryRepository,
             UserExpenseSubCategoryRepository userExpenseSubCategoryRepository
     ) {
         return args -> {
+            User user = new UserBuilder()
+                    .identityIssuer("https://auth.example.com/realms/myrealm")
+                    .identitySubject("7f3a9c21-6b84-4d17-a5e2-9c8f1b7d6043")
+                    .build();
+
             UserProfile userProfile = new UserProfileBuilder()
+                    .user(user)
                     .build();
 
             UserPaymentMethod card = new UserPaymentMethodBuilder()
@@ -48,7 +45,7 @@ public class DevDataInitializer {
                     .userExpenseCategory(userExpenseCategory)
                     .build();
 
-            userProfileRepository.save(userProfile);
+            userRepository.save(user);
             paymentMethodRepository.save(card);
             userExpenseCategoryRepository.save(userExpenseCategory);
             userExpenseSubCategoryRepository.save(userExpenseSubCategory);
