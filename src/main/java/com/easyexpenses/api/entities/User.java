@@ -2,9 +2,20 @@ package com.easyexpenses.api.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.Instant;
 
 @Entity
-@Table(name="user")
+@Table(
+        name = "user",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_identity_issuer_subject",
+                        columnNames = {"identity_issuer", "identity_subject"}
+                )
+        }
+)
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,16 +26,25 @@ public class User {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(nullable = false)
-    private String username;
+    @Column(name = "identity_issuer", nullable = false)
+    private String identityIssuer;
 
-    @Column(nullable = false)
-    private String provider;
+    @Column(name = "identity_subject", nullable = false)
+    private String identitySubject;
 
-    @Column(nullable = false)
-    private String provider_id;
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @OneToOne(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private UserProfile userProfile;
+
+    public void setUserProfile(UserProfile userProfile){
+        this.userProfile = userProfile;
+        userProfile.setUser(this);
+    }
 }

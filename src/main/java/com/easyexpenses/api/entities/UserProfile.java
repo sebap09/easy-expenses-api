@@ -15,33 +15,36 @@ import java.util.Set;
 public class UserProfile {
     @Id
     @Column(unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    private Long userId;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @OneToMany(
-            mappedBy="user",
+            mappedBy="userProfile",
             cascade = CascadeType.REMOVE,
             orphanRemoval = true)
     @Setter(AccessLevel.NONE)
     private Set<Expense> expenses = new HashSet<>();
 
     @OneToMany(
-            mappedBy="user",
+            mappedBy="userProfile",
             cascade = CascadeType.REMOVE,
             orphanRemoval = true)
     @Setter(AccessLevel.NONE)
     private Set<UserPaymentMethod> userPaymentMethods = new HashSet<>();
 
     @OneToMany(
-            mappedBy="user",
+            mappedBy="userProfile",
             cascade = CascadeType.REMOVE,
             orphanRemoval = true)
     @Setter(AccessLevel.NONE)
     private Set<UserExpenseCategory> userExpenseCategories = new HashSet<>();
 
-
     @OneToMany(
-            mappedBy="user",
+            mappedBy="userProfile",
             cascade = CascadeType.REMOVE,
             orphanRemoval = true)
     @Setter(AccessLevel.NONE)
@@ -49,21 +52,21 @@ public class UserProfile {
 
     public void addNewExpense(Expense expense){
         this.expenses.add(expense);
-        expense.setUser(this);
+        expense.setUserProfile(this);
     }
 
     public void addNewUserPaymentMethod(UserPaymentMethod userPaymentMethod){
         this.userPaymentMethods.add(userPaymentMethod);
-        userPaymentMethod.setUser(this);
+        userPaymentMethod.setUserProfile(this);
     }
 
     public void addNewUserCategory(UserExpenseCategory userExpenseCategory){
         this.userExpenseCategories.add(userExpenseCategory);
-        userExpenseCategory.setUser(this);
+        userExpenseCategory.setUserProfile(this);
     }
 
     public void addNewUserSubCategory(UserExpenseSubCategory userExpenseSubCategory){
         this.userExpenseSubCategories.add(userExpenseSubCategory);
-        userExpenseSubCategory.setUser(this);
+        userExpenseSubCategory.setUserProfile(this);
     }
 }
