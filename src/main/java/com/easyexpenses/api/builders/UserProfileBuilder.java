@@ -12,7 +12,7 @@ public class UserProfileBuilder {
 
     public UserProfile build() {
         UserProfile userProfile = new UserProfile();
-        userProfile.setId(id);
+        userProfile.setUserId(id);
         return userProfile;
     }
 }

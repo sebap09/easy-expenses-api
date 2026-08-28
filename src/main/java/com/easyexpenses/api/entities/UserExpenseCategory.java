@@ -36,7 +36,7 @@ public class UserExpenseCategory {
 
     @ManyToOne
     @JoinColumn(name="userId", nullable=false)
-    private UserProfile user;
+    private UserProfile userProfile;
 
     @OneToMany(mappedBy="userExpenseCategory")
     @Setter(AccessLevel.NONE)

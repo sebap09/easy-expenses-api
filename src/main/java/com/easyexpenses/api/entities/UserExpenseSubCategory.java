@@ -36,7 +36,7 @@ public class UserExpenseSubCategory {
 
     @ManyToOne
     @JoinColumn(name="userId", nullable=false)
-    private UserProfile user;
+    private UserProfile userProfile;
 
     @ManyToOne
     @JoinColumn(name="userExpenseCategoryId", nullable=false)

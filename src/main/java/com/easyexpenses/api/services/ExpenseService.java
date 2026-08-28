@@ -67,10 +67,10 @@ public class ExpenseService {
             UserExpenseCategory userExpenseCategory,
             UserExpenseSubCategory userExpenseSubCategory
     ) {
-        Long userId = userProfile.getId();
-        return Objects.equals(userId, userPaymentMethod.getUser().getId()) &&
-                Objects.equals(userId, userExpenseCategory.getUser().getId()) &&
-                Objects.equals(userId, userExpenseSubCategory.getUser().getId());
+        Long userId = userProfile.getUserId();
+        return Objects.equals(userId, userPaymentMethod.getUserProfile().getUserId()) &&
+                Objects.equals(userId, userExpenseCategory.getUserProfile().getUserId()) &&
+                Objects.equals(userId, userExpenseSubCategory.getUserProfile().getUserId());
     }
 
     private boolean isSubCategoryAssignedToProperCategory(

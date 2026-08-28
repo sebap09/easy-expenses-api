@@ -23,7 +23,7 @@ public class UserProfileService {
                                 "User not found: " + id));
     }
 
-    public UserProfile save(UserProfile user){
-        return userProfileRepository.save(user);
+    public UserProfile save(UserProfile userProfile){
+        return userProfileRepository.save(userProfile);
     }
 }
