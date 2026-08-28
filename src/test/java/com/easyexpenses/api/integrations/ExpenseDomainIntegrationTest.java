@@ -79,19 +79,19 @@ public class ExpenseDomainIntegrationTest {
         //userProfile expense sub category data is persisted correctly
         assertEquals(userExpenseSubCategory.getName(), savedExpense.getUserExpenseSubCategory().getName());
         //userProfile data is persisted correctly
-        assertEquals(userProfile.getId(), savedExpense.getUser().getId());
+        assertEquals(userProfile.getUserId(), savedExpense.getUserProfile().getUserId());
 
         //8
         //OneToMany mappings, remember to not use equals (since the hash is not the same)
         assertTrue(
-                savedExpense.getUser()
+                savedExpense.getUserProfile()
                         .getExpenses()
                         .stream()
                         .anyMatch(e -> e.getId().equals(savedExpense.getId()))
         );
 
         assertTrue(
-                savedExpense.getUser()
+                savedExpense.getUserProfile()
                         .getUserPaymentMethods()
                         .stream()
                         .anyMatch(pm ->
@@ -100,7 +100,7 @@ public class ExpenseDomainIntegrationTest {
         );
 
         assertTrue(
-                savedExpense.getUser()
+                savedExpense.getUserProfile()
                         .getUserExpenseCategories()
                         .stream()
                         .anyMatch(pm ->
@@ -109,7 +109,7 @@ public class ExpenseDomainIntegrationTest {
         );
 
         assertTrue(
-                savedExpense.getUser()
+                savedExpense.getUserProfile()
                         .getUserExpenseSubCategories()
                         .stream()
                         .anyMatch(pm ->
@@ -154,20 +154,20 @@ public class ExpenseDomainIntegrationTest {
 
         //User <-> UserPaymentMethod consistency check
         assertEquals(
-                savedExpense.getUser().getId(),
-                savedExpense.getUserPaymentMethod().getUser().getId()
+                savedExpense.getUserProfile().getUserId(),
+                savedExpense.getUserPaymentMethod().getUserProfile().getUserId()
         );
 
         //User <-> UserExpenseCategory consistency check
         assertEquals(
-                savedExpense.getUser().getId(),
-                savedExpense.getUserExpenseCategory().getUser().getId()
+                savedExpense.getUserProfile().getUserId(),
+                savedExpense.getUserExpenseCategory().getUserProfile().getUserId()
         );
 
         //User <-> UserExpenseSubCategory consistency check
         assertEquals(
-                savedExpense.getUser().getId(),
-                savedExpense.getUserExpenseSubCategory().getUser().getId()
+                savedExpense.getUserProfile().getUserId(),
+                savedExpense.getUserExpenseSubCategory().getUserProfile().getUserId()
         );
     }
 
@@ -223,16 +223,16 @@ public class ExpenseDomainIntegrationTest {
         assertEquals("CARD",
                 savedCardExpense.getUserPaymentMethod().getName());
         assertEquals(2,
-                savedCardExpense.getUser().getUserPaymentMethods().size());
+                savedCardExpense.getUserProfile().getUserPaymentMethods().size());
 
         Expense savedCashExpense = expenseRepository.findById(cashExpense.getId()).orElseThrow();
         assertEquals("CASH",
                 savedCashExpense.getUserPaymentMethod().getName());
         assertEquals(2,
-                savedCashExpense.getUser().getUserPaymentMethods().size());
+                savedCashExpense.getUserProfile().getUserPaymentMethods().size());
 
         assertEquals(2,
-                savedCashExpense.getUser().getExpenses().size());
+                savedCashExpense.getUserProfile().getExpenses().size());
         assertEquals(savedCardExpense.getUserExpenseCategory().getName(),
                 savedCashExpense.getUserExpenseCategory().getName());
         assertEquals(savedCardExpense.getUserExpenseSubCategory().getName(),

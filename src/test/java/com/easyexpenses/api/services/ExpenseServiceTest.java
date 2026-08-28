@@ -62,7 +62,7 @@ public class ExpenseServiceTest {
 
 
         AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
-                expenseFixture.getUser().getId(),
+                expenseFixture.getUser().getUserId(),
                 expenseFixture.getUserExpenseCategory().getId(),
                 expenseFixture.getUserExpenseSubCategory().getId(),
                 expenseFixture.getUserPaymentMethod().getId(),
@@ -103,7 +103,7 @@ public class ExpenseServiceTest {
         ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
 
         AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
-                expenseFixture.getUser().getId(),
+                expenseFixture.getUser().getUserId(),
                 expenseFixture.getUserExpenseCategory().getId(),
                 expenseFixture.getUserExpenseSubCategory().getId(),
                 expenseFixture.getUserPaymentMethod().getId(),
@@ -140,7 +140,7 @@ public class ExpenseServiceTest {
 
 
         AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
-                expenseFixture.getUser().getId(),
+                expenseFixture.getUser().getUserId(),
                 expenseFixture.getUserExpenseCategory().getId(),
                 expenseFixture.getUserExpenseSubCategory().getId(),
                 expenseFixture.getUserPaymentMethod().getId(),
