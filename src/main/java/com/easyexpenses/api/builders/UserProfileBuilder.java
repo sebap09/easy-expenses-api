@@ -1,18 +1,29 @@
 package com.easyexpenses.api.builders;
+import com.easyexpenses.api.entities.User;
 import com.easyexpenses.api.entities.UserProfile;
 
 public class UserProfileBuilder {
 
-    private Long id;
+    private User user;
 
-    public UserProfileBuilder id(Long id) {
-        this.id = id;
+    public UserProfileBuilder user(User user){
+        this.user =  user;
+        return this;
+    }
+
+    public UserProfileBuilder user(Long id){
+        this.user = new UserBuilder()
+                .id(id)
+                .identityIssuer("https://auth.example.com/realms/myrealm")
+                .identitySubject(UserBuilder.getRandomSubject())
+                .build();
         return this;
     }
 
     public UserProfile build() {
         UserProfile userProfile = new UserProfile();
-        userProfile.setUserId(id);
+        userProfile.setUser(user);
+        user.setUserProfile(userProfile);
         return userProfile;
     }
 }
