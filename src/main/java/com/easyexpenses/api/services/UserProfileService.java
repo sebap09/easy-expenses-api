@@ -27,7 +27,7 @@ public class UserProfileService {
     }
 
     public UserProfile getUserProfile(Long id){
-        return userProfileRepository.findById(id)
+        return userProfileRepository.findByUserId(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "User not found: " + id));

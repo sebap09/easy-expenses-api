@@ -20,9 +20,18 @@ public class UserProfileBuilder {
         return this;
     }
 
+    public UserProfileBuilder user(){
+        this.user = new UserBuilder()
+                .identityIssuer("https://auth.example.com/realms/myrealm")
+                .identitySubject(UserBuilder.getRandomSubject())
+                .build();
+        return this;
+    }
+
     public UserProfile build() {
         UserProfile userProfile = new UserProfile();
         userProfile.setUser(user);
+        userProfile.setUserId(user.getId());
         user.setUserProfile(userProfile);
         return userProfile;
     }
