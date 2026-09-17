@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class UserExpenseSubCategoryTest {
 
     @Autowired
-    private UserProfileRepository userProfileRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private UserExpenseCategoryRepository userExpenseCategoryRepository;
@@ -32,7 +32,10 @@ public class UserExpenseSubCategoryTest {
 
     @Test
     void shouldConvertNameToUppercase() {
-        UserProfile userProfile = new UserProfileBuilder().build();
+        UserProfile userProfile = new UserProfileBuilder()
+                .user()
+                .build();
+
         String name = "Grocery";
         UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
                 .userProfile(userProfile)
@@ -44,7 +47,7 @@ public class UserExpenseSubCategoryTest {
                 .userExpenseCategory(userExpenseCategory)
                 .build();
 
-        userProfileRepository.save(userProfile);
+        userRepository.save(userProfile.getUser());
         userExpenseCategoryRepository.save(userExpenseCategory);
         userExpenseSubCategoryRepository.save(userExpenseSubCategory);
 
@@ -55,7 +58,10 @@ public class UserExpenseSubCategoryTest {
     @Test
     void shouldThrowExceptionWhenNameIsNotUnique() {
         //entities & relationships data
-        UserProfile userProfile = new UserProfileBuilder().build();
+        UserProfile userProfile = new UserProfileBuilder()
+                .user()
+                .build();
+
         String name = "Grocery";
         UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
                 .userProfile(userProfile)
@@ -67,7 +73,7 @@ public class UserExpenseSubCategoryTest {
                 .userExpenseCategory(userExpenseCategory)
                 .build();
 
-        userProfileRepository.save(userProfile);
+        userRepository.save(userProfile.getUser());
         userExpenseCategoryRepository.save(userExpenseCategory);
         userExpenseSubCategoryRepository.save(userExpenseSubCategory);
 
@@ -89,7 +95,10 @@ public class UserExpenseSubCategoryTest {
 
     @Test
     void shouldAllowTheSameNameForDifferentUsers() {
-        UserProfile firstUser = new UserProfileBuilder().build();
+        UserProfile firstUser = new UserProfileBuilder()
+                .user()
+                .build();
+
         String name = "Grocery";
         UserExpenseCategory firstUserExpenseCategory = new UserExpenseCategoryBuilder()
                 .userProfile(firstUser)
@@ -101,11 +110,13 @@ public class UserExpenseSubCategoryTest {
                 .userExpenseCategory(firstUserExpenseCategory)
                 .build();
 
-        userProfileRepository.save(firstUser);
+        userRepository.save(firstUser.getUser());
         userExpenseCategoryRepository.save(firstUserExpenseCategory);
         userExpenseSubCategoryRepository.save(firstUserExpenseSubCategory);
 
-        UserProfile secondUser = new UserProfileBuilder().build();
+        UserProfile secondUser = new UserProfileBuilder()
+                .user()
+                .build();
         UserExpenseCategory secondUserExpenseCategory = new UserExpenseCategoryBuilder()
                 .userProfile(secondUser)
                 .name("Travel")
@@ -116,7 +127,7 @@ public class UserExpenseSubCategoryTest {
                 .userExpenseCategory(firstUserExpenseCategory)
                 .build();
 
-        userProfileRepository.save(secondUser);
+        userRepository.save(secondUser.getUser());
         userExpenseCategoryRepository.save(secondUserExpenseCategory);
         userExpenseSubCategoryRepository.save(secondUserExpenseSubCategory);
 

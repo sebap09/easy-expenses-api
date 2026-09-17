@@ -8,14 +8,14 @@ import lombok.Getter;
 
 @Getter
 public class ExpenseFixture {
-    private final UserProfile user;
+    private final UserProfile userProfile;
     private final UserPaymentMethod userPaymentMethod;
     private final UserExpenseCategory userExpenseCategory;
     private final UserExpenseSubCategory userExpenseSubCategory;
 
 
-    public ExpenseFixture(UserProfile user, UserPaymentMethod userPaymentMethod, UserExpenseCategory userExpenseCategory, UserExpenseSubCategory userExpenseSubCategory) {
-        this.user = user;
+    public ExpenseFixture(UserProfile userProfile, UserPaymentMethod userPaymentMethod, UserExpenseCategory userExpenseCategory, UserExpenseSubCategory userExpenseSubCategory) {
+        this.userProfile = userProfile;
         this.userPaymentMethod = userPaymentMethod;
         this.userExpenseCategory = userExpenseCategory;
         this.userExpenseSubCategory = userExpenseSubCategory;

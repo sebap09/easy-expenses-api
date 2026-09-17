@@ -62,7 +62,7 @@ public class ExpenseServiceTest {
 
 
         AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
-                expenseFixture.getUser().getUserId(),
+                expenseFixture.getUserProfile().getUserId(),
                 expenseFixture.getUserExpenseCategory().getId(),
                 expenseFixture.getUserExpenseSubCategory().getId(),
                 expenseFixture.getUserPaymentMethod().getId(),
@@ -73,7 +73,7 @@ public class ExpenseServiceTest {
 
         //mocks behavior definition
         when(userProfileService.getUserProfile(addNewExpenseRequest.userId()))
-                .thenReturn(expenseFixture.getUser());
+                .thenReturn(expenseFixture.getUserProfile());
 
         //wrong userProfile payment method
         when(userPaymentMethodService.getUserPaymentMethod(addNewExpenseRequest.userPaymentMethodId()))
@@ -103,7 +103,7 @@ public class ExpenseServiceTest {
         ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
 
         AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
-                expenseFixture.getUser().getUserId(),
+                expenseFixture.getUserProfile().getUserId(),
                 expenseFixture.getUserExpenseCategory().getId(),
                 expenseFixture.getUserExpenseSubCategory().getId(),
                 expenseFixture.getUserPaymentMethod().getId(),
@@ -114,7 +114,7 @@ public class ExpenseServiceTest {
 
         //mocks behavior definition
         when(userProfileService.getUserProfile(addNewExpenseRequest.userId()))
-                .thenReturn(expenseFixture.getUser());
+                .thenReturn(expenseFixture.getUserProfile());
 
         when(userPaymentMethodService.getUserPaymentMethod(addNewExpenseRequest.userPaymentMethodId()))
                 .thenReturn(expenseFixture.getUserPaymentMethod());
@@ -135,12 +135,12 @@ public class ExpenseServiceTest {
         ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
         UserExpenseCategory anotherCategory = new UserExpenseCategoryBuilder()
                 .id(2L)
-                .userProfile(expenseFixture.getUser())
+                .userProfile(expenseFixture.getUserProfile())
                 .build();
 
 
         AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
-                expenseFixture.getUser().getUserId(),
+                expenseFixture.getUserProfile().getUserId(),
                 expenseFixture.getUserExpenseCategory().getId(),
                 expenseFixture.getUserExpenseSubCategory().getId(),
                 expenseFixture.getUserPaymentMethod().getId(),
@@ -151,7 +151,7 @@ public class ExpenseServiceTest {
 
         //mocks behavior definition
         when(userProfileService.getUserProfile(addNewExpenseRequest.userId()))
-                .thenReturn(expenseFixture.getUser());
+                .thenReturn(expenseFixture.getUserProfile());
 
         when(userPaymentMethodService.getUserPaymentMethod(addNewExpenseRequest.userPaymentMethodId()))
                 .thenReturn(expenseFixture.getUserPaymentMethod());

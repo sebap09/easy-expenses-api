@@ -17,7 +17,7 @@ public class ExpenseDomainIntegrationTest {
     private ExpenseRepository expenseRepository;
 
     @Autowired
-    private UserProfileRepository userProfileRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private UserPaymentMethodRepository userPaymentMethodRepository;
@@ -35,7 +35,9 @@ public class ExpenseDomainIntegrationTest {
     @Test
     void shouldPersistExpenseWithDomain() {
         //entities & relationships data
-        UserProfile userProfile = new UserProfileBuilder().build();
+        UserProfile userProfile = new UserProfileBuilder()
+                .user()
+                .build();
 
         UserPaymentMethod userPaymentMethod = new UserPaymentMethodBuilder()
                 .userProfile(userProfile)
@@ -58,7 +60,7 @@ public class ExpenseDomainIntegrationTest {
                 .build();
 
         //saving entities to db
-        userProfileRepository.save(userProfile);
+        userRepository.save(userProfile.getUser());
         userPaymentMethodRepository.save(userPaymentMethod);
         userExpenseCategoryRepository.save(userExpenseCategory);
         userExpenseSubCategoryRepository.save(userExpenseSubCategory);
@@ -173,7 +175,9 @@ public class ExpenseDomainIntegrationTest {
 
     @Test
     void shouldPersistMultipleExpensesUsingDifferentUserPaymentMethods() {
-        UserProfile userProfile = new UserProfileBuilder().build();
+        UserProfile userProfile = new UserProfileBuilder()
+                .user()
+                .build();
 
         UserPaymentMethod card = new UserPaymentMethodBuilder()
                 .userProfile(userProfile)
@@ -208,7 +212,7 @@ public class ExpenseDomainIntegrationTest {
                 .userExpenseSubCategory(userExpenseSubCategory)
                 .build();
 
-        userProfileRepository.save(userProfile);
+        userRepository.save(userProfile.getUser());
         userPaymentMethodRepository.save(card);
         userPaymentMethodRepository.save(cash);
         userExpenseCategoryRepository.save(userExpenseCategory);
