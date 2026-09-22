@@ -21,8 +21,8 @@ public class DevDataInitializer {
     ) {
         return args -> {
             User user = new UserBuilder()
-                    .identityIssuer("https://auth.example.com/realms/myrealm")
-                    .identitySubject("7f3a9c21-6b84-4d17-a5e2-9c8f1b7d6043")
+                    .identityIssuer("http://localhost:9090/realms/my-realm")
+                    .identitySubject("f759323e-5b47-44a6-8d0f-a8b5563cccd1")
                     .build();
 
             UserProfile userProfile = new UserProfileBuilder()
@@ -34,21 +34,49 @@ public class DevDataInitializer {
                     .name("CARD")
                     .build();
 
-            UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
+            UserExpenseCategory firstUserExpenseCategory = new UserExpenseCategoryBuilder()
                     .userProfile(userProfile)
                     .name("Zakupy")
                     .build();
 
-            UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategoryBuilder()
+            UserExpenseSubCategory firstSubCategoryForFirstCategory = new UserExpenseSubCategoryBuilder()
                     .userProfile(userProfile)
                     .name("Jedzenie/kosmetyki/chemia/inne")
-                    .userExpenseCategory(userExpenseCategory)
+                    .userExpenseCategory(firstUserExpenseCategory)
+                    .build();
+
+            UserExpenseSubCategory secondSubCategoryForFirstCategory = new UserExpenseSubCategoryBuilder()
+                    .userProfile(userProfile)
+                    .name("Apteka")
+                    .userExpenseCategory(firstUserExpenseCategory)
+                    .build();
+
+            UserExpenseCategory secondUserExpenseCategory = new UserExpenseCategoryBuilder()
+                    .userProfile(userProfile)
+                    .name("Transport")
+                    .build();
+
+            UserExpenseSubCategory firstSubCategoryForSecondCategory = new UserExpenseSubCategoryBuilder()
+                    .userProfile(userProfile)
+                    .name("Paliwo")
+                    .userExpenseCategory(secondUserExpenseCategory)
+                    .build();
+
+            UserExpenseSubCategory secondSubCategoryForSecondCategory = new UserExpenseSubCategoryBuilder()
+                    .userProfile(userProfile)
+                    .name("Parking")
+                    .userExpenseCategory(secondUserExpenseCategory)
                     .build();
 
             userRepository.save(user);
             paymentMethodRepository.save(card);
-            userExpenseCategoryRepository.save(userExpenseCategory);
-            userExpenseSubCategoryRepository.save(userExpenseSubCategory);
+            userExpenseCategoryRepository.save(firstUserExpenseCategory);
+            userExpenseSubCategoryRepository.save(firstSubCategoryForFirstCategory);
+            userExpenseSubCategoryRepository.save(secondSubCategoryForFirstCategory);
+
+            userExpenseCategoryRepository.save(secondUserExpenseCategory);
+            userExpenseSubCategoryRepository.save(firstSubCategoryForSecondCategory);
+            userExpenseSubCategoryRepository.save(secondSubCategoryForSecondCategory);
         };
     }
 }
