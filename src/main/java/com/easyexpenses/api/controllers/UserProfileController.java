@@ -1,6 +1,6 @@
 package com.easyexpenses.api.controllers;
 
-import com.easyexpenses.api.dtos.UserProfileResponse;
+import com.easyexpenses.api.dtos.userprofile.UserProfileResponse;
 import com.easyexpenses.api.services.UserProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ public class UserProfileController {
     // GET http://localhost:8080/api/v1/me
     @GetMapping
     public ResponseEntity<UserProfileResponse> me(@AuthenticationPrincipal Jwt jwt) {
-        return new ResponseEntity<>(userProfileService.findOrCreateUser(jwt), HttpStatus.OK);
+        return new ResponseEntity<>(userProfileService.getUserProfileData(jwt), HttpStatus.OK);
     }
 
 }

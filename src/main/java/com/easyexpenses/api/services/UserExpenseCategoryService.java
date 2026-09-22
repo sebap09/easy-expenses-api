@@ -6,6 +6,8 @@ import com.easyexpenses.api.repositories.UserExpenseCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserExpenseCategoryService {
     private final UserExpenseCategoryRepository userExpenseCategoryRepository;
@@ -20,5 +22,9 @@ public class UserExpenseCategoryService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "User Expense Category not found: " + id));
+    }
+
+    public List<UserExpenseCategory> getAllUserExpenseCategories(Long userId) {
+        return userExpenseCategoryRepository.findAllByUserId(userId);
     }
 }

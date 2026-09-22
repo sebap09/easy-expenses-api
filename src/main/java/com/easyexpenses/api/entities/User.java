@@ -12,7 +12,7 @@ import java.time.Instant;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_identity_issuer_subject",
-                        columnNames = {"identity_issuer", "identity_subject"}
+                        columnNames = {"identityIssuer", "identitySubject"}
                 )
         }
 )
@@ -26,10 +26,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(name = "identity_issuer", nullable = false)
+    @Column(name = "identityIssuer", nullable = false)
     private String identityIssuer;
 
-    @Column(name = "identity_subject", nullable = false)
+    @Column(name = "identitySubject", nullable = false)
     private String identitySubject;
 
     @CreationTimestamp

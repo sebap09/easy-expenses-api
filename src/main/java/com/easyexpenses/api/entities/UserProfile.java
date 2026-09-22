@@ -19,7 +19,7 @@ public class UserProfile {
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId")
     private User user;
 
     @OneToMany(

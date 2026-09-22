@@ -6,6 +6,8 @@ import com.easyexpenses.api.repositories.UserPaymentMethodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserPaymentMethodService {
     private final UserPaymentMethodRepository userPaymentMethodRepository;
@@ -20,5 +22,9 @@ public class UserPaymentMethodService {
                 .orElseThrow(() ->
                     new ResourceNotFoundException(
                         "User Payment Method not found: " + id));
+    }
+
+    public List<UserPaymentMethod> getAllUserPaymentMethods(Long userId){
+        return userPaymentMethodRepository.findAllByUserId(userId);
     }
 }
