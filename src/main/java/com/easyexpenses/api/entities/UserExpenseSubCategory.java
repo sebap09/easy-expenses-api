@@ -11,7 +11,7 @@ import java.util.Set;
         name = "user_expense_sub_category",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        columnNames = {"userId", "name"}
+                        columnNames = {"userId", "name", "userExpenseCategoryId"}
                 )
         }
 )

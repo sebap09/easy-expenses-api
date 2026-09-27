@@ -22,31 +22,19 @@ public class UserProfile {
     @JoinColumn(name = "userId")
     private User user;
 
-    @OneToMany(
-            mappedBy="userProfile",
-            cascade = CascadeType.REMOVE,
-            orphanRemoval = true)
+    @OneToMany(mappedBy="userProfile")
     @Setter(AccessLevel.NONE)
     private Set<Expense> expenses = new HashSet<>();
 
-    @OneToMany(
-            mappedBy="userProfile",
-            cascade = CascadeType.REMOVE,
-            orphanRemoval = true)
+    @OneToMany(mappedBy="userProfile")
     @Setter(AccessLevel.NONE)
     private Set<UserPaymentMethod> userPaymentMethods = new HashSet<>();
 
-    @OneToMany(
-            mappedBy="userProfile",
-            cascade = CascadeType.REMOVE,
-            orphanRemoval = true)
+    @OneToMany(mappedBy="userProfile")
     @Setter(AccessLevel.NONE)
     private Set<UserExpenseCategory> userExpenseCategories = new HashSet<>();
 
-    @OneToMany(
-            mappedBy="userProfile",
-            cascade = CascadeType.REMOVE,
-            orphanRemoval = true)
+    @OneToMany(mappedBy="userProfile")
     @Setter(AccessLevel.NONE)
     private Set<UserExpenseSubCategory> userExpenseSubCategories = new HashSet<>();
 
