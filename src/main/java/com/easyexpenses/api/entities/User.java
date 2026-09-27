@@ -38,8 +38,7 @@ public class User {
 
     @OneToOne(
             mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+            cascade = CascadeType.PERSIST
     )
     private UserProfile userProfile;
 

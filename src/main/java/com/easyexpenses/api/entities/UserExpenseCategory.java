@@ -42,7 +42,8 @@ public class UserExpenseCategory {
     @Setter(AccessLevel.NONE)
     private Set<Expense> expensesRelatedWithThisCategory = new HashSet<>();
 
-    @OneToMany(mappedBy="userExpenseCategory")
+    @OneToMany(mappedBy="userExpenseCategory",
+            cascade = CascadeType.PERSIST)
     @Setter(AccessLevel.NONE)
     private Set<UserExpenseSubCategory> subCategoriesRelatedWithThisCategory = new HashSet<>();
 
