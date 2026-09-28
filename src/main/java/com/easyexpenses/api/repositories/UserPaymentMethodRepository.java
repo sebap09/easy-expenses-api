@@ -13,6 +13,7 @@ public interface UserPaymentMethodRepository extends JpaRepository<UserPaymentMe
         SELECT p
         FROM UserPaymentMethod p
         WHERE p.userProfile.userId = :userId
+        ORDER BY p.id
     """)
     List<UserPaymentMethod> findAllByUserId(Long userId);
 }
