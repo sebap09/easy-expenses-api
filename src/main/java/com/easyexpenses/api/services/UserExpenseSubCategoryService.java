@@ -23,8 +23,4 @@ public class UserExpenseSubCategoryService {
                         new ResourceNotFoundException(
                                 "User Expense Sub Category not found: " + id));
     }
-
-    public List<UserExpenseSubCategory> getAllUserExpenseSubCategories(Long userId) {
-        return userExpenseSubCategoryRepository.findAllByUserId(userId);
-    }
 }

@@ -27,4 +27,8 @@ public class UserExpenseCategoryService {
     public List<UserExpenseCategory> getAllUserExpenseCategories(Long userId) {
         return userExpenseCategoryRepository.findAllByUserId(userId);
     }
+
+    public List<UserExpenseCategory> saveAll(List<UserExpenseCategory> categories) {
+        return userExpenseCategoryRepository.saveAll(categories);
+    }
 }

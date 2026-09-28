@@ -17,14 +17,18 @@ public class UserPaymentMethodService {
         this.userPaymentMethodRepository = userPaymentMethodRepository;
     }
 
-    public UserPaymentMethod getUserPaymentMethod(Long id){
+    public UserPaymentMethod getUserPaymentMethod(Long id) {
         return userPaymentMethodRepository.findById(id)
                 .orElseThrow(() ->
-                    new ResourceNotFoundException(
-                        "User Payment Method not found: " + id));
+                        new ResourceNotFoundException(
+                                "User Payment Method not found: " + id));
     }
 
-    public List<UserPaymentMethod> getAllUserPaymentMethods(Long userId){
+    public List<UserPaymentMethod> getAllUserPaymentMethods(Long userId) {
         return userPaymentMethodRepository.findAllByUserId(userId);
+    }
+
+    public List<UserPaymentMethod> saveAll(List<UserPaymentMethod> paymentMethods) {
+        return userPaymentMethodRepository.saveAll(paymentMethods);
     }
 }

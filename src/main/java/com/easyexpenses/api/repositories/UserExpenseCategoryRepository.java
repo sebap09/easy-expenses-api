@@ -11,6 +11,7 @@ public interface UserExpenseCategoryRepository extends JpaRepository<UserExpense
         SELECT c
         FROM UserExpenseCategory c
         WHERE c.userProfile.userId = :userId
+        ORDER BY c.id
     """)
     List<UserExpenseCategory> findAllByUserId(Long userId);
 }
