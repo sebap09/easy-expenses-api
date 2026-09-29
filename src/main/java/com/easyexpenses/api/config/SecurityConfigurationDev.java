@@ -1,7 +1,6 @@
 package com.easyexpenses.api.config;
 
-import com.easyexpenses.api.security.CustomAccessDeniedHandler;
-import com.easyexpenses.api.security.CustomAuthenticationEntryPoint;
+import com.easyexpenses.api.security.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -15,13 +14,13 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@Profile("prod")
-public class SecurityConfiguration {
+@Profile("dev")
+public class SecurityConfigurationDev {
 
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-    public SecurityConfiguration(CustomAuthenticationEntryPoint customAuthenticationEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler) {
+    public SecurityConfigurationDev(CustomAuthenticationEntryPoint customAuthenticationEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler) {
         this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
         this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
@@ -38,6 +37,10 @@ public class SecurityConfiguration {
                     httpSecurityHeadersConfigurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable);
                 })
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/h2-console",
+                                "/h2-console/**")
+                        .permitAll()
                         .anyRequest()
                         .authenticated()
                 )
