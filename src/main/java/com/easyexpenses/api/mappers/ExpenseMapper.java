@@ -9,7 +9,6 @@ public class ExpenseMapper {
     public ExpenseResponse toResponse(Expense expense) {
         return new ExpenseResponse(
                 expense.getId(),
-                expense.getUserProfile().getUserId(),
                 expense.getUserExpenseCategory().getId(),
                 expense.getUserExpenseSubCategory().getId(),
                 expense.getUserPaymentMethod().getId(),

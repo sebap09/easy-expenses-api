@@ -3,16 +3,17 @@ package com.easyexpenses.api.controllers;
 import com.easyexpenses.api.builders.ExpenseFixtureBuilder;
 import com.easyexpenses.api.dtos.AddNewExpenseRequest;
 import com.easyexpenses.api.dtos.ExpenseResponse;
-import com.easyexpenses.api.errors.ErrorCode;
+import com.easyexpenses.api.entities.UserProfile;
 import com.easyexpenses.api.errors.ResourceNotFoundException;
-import com.easyexpenses.api.errors.ValidationException;
 import com.easyexpenses.api.fixtures.ExpenseFixture;
 import com.easyexpenses.api.services.ExpenseService;
+import com.easyexpenses.api.services.UserProfileService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -23,8 +24,10 @@ import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -41,6 +44,9 @@ public class ExpenseControllerTest {
     @MockitoBean
     private ExpenseService expenseService;
 
+    @MockitoBean
+    private UserProfileService userProfileService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -52,7 +58,6 @@ public class ExpenseControllerTest {
         String comment = "comment";
 
         AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
-                expenseFixture.getUserProfile().getUserId(),
                 expenseFixture.getUserExpenseCategory().getId(),
                 expenseFixture.getUserExpenseSubCategory().getId(),
                 expenseFixture.getUserPaymentMethod().getId(),
@@ -63,7 +68,6 @@ public class ExpenseControllerTest {
 
         ExpenseResponse expenseResponse = new ExpenseResponse(
                 1L,
-                expenseFixture.getUserProfile().getUserId(),
                 expenseFixture.getUserExpenseCategory().getId(),
                 expenseFixture.getUserExpenseSubCategory().getId(),
                 expenseFixture.getUserPaymentMethod().getId(),
@@ -72,12 +76,16 @@ public class ExpenseControllerTest {
                 comment
         );
 
-        when(expenseService.addNewExpense(addNewExpenseRequest))
+        when(userProfileService.findOrCreateUser(any(Jwt.class)))
+                .thenReturn(expenseFixture.getUserProfile());
+
+        when(expenseService.addNewExpense(any(UserProfile.class), any(AddNewExpenseRequest.class)))
                 .thenReturn(expenseResponse);
 
 
         MvcResult result = mockMvc.perform(
                         post(EXPENSES_ENDPOINT)
+                                .with(jwt())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(addNewExpenseRequest))
 
@@ -101,7 +109,7 @@ public class ExpenseControllerTest {
                 .isEqualTo(expenseResponse);
 
         verify(expenseService)
-                .addNewExpense(addNewExpenseRequest);
+                .addNewExpense(expenseFixture.getUserProfile(), addNewExpenseRequest);
     }
 
     @Test
@@ -109,7 +117,6 @@ public class ExpenseControllerTest {
         ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
         ExpenseResponse expenseResponse = new ExpenseResponse(
                 1L,
-                expenseFixture.getUserProfile().getUserId(),
                 expenseFixture.getUserExpenseCategory().getId(),
                 expenseFixture.getUserExpenseSubCategory().getId(),
                 expenseFixture.getUserPaymentMethod().getId(),
@@ -126,6 +133,7 @@ public class ExpenseControllerTest {
 
         MvcResult result = mockMvc.perform(
                         get(EXPENSES_ENDPOINT)
+                                .with(jwt())
 
                 )
                 .andExpect(status().isOk())
@@ -154,7 +162,6 @@ public class ExpenseControllerTest {
         ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
         String errorMessage = "Resource Not Found";
         AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
-                expenseFixture.getUserProfile().getUserId(),
                 expenseFixture.getUserExpenseCategory().getId(),
                 expenseFixture.getUserExpenseSubCategory().getId(),
                 expenseFixture.getUserPaymentMethod().getId(),
@@ -163,12 +170,16 @@ public class ExpenseControllerTest {
                 "comment"
         );
 
-        when(expenseService.addNewExpense(addNewExpenseRequest))
+        when(userProfileService.findOrCreateUser(any(Jwt.class)))
+                .thenReturn(expenseFixture.getUserProfile());
+
+        when(expenseService.addNewExpense(expenseFixture.getUserProfile(), addNewExpenseRequest))
                 .thenThrow(new ResourceNotFoundException(errorMessage));
 
 
         mockMvc.perform(
                         post(EXPENSES_ENDPOINT)
+                                .with(jwt())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(addNewExpenseRequest))
                 )
@@ -180,79 +191,7 @@ public class ExpenseControllerTest {
                 .andExpect(jsonPath("$.title").value("Not Found"));
 
         verify(expenseService)
-                .addNewExpense(addNewExpenseRequest);
-    }
-
-    @Test
-    void shouldReturn400WhenInvalidUserRelationshipExceptionWasThrown() throws Exception {
-        ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
-        String errorMessage = "User Id does not match across domain data";
-        ErrorCode errorCode = ErrorCode.INVALID_USER_RELATIONSHIP;
-        AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
-                expenseFixture.getUserProfile().getUserId(),
-                expenseFixture.getUserExpenseCategory().getId(),
-                expenseFixture.getUserExpenseSubCategory().getId(),
-                expenseFixture.getUserPaymentMethod().getId(),
-                new Date(),
-                100d,
-                "comment"
-        );
-
-        when(expenseService.addNewExpense(addNewExpenseRequest))
-                .thenThrow(new ValidationException(errorMessage, errorCode));
-
-
-        mockMvc.perform(
-                        post(EXPENSES_ENDPOINT)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(addNewExpenseRequest))
-                )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
-                .andExpect(jsonPath("$.detail").value(errorMessage))
-                .andExpect(jsonPath("$.instance").value(EXPENSES_ENDPOINT))
-                .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.title").value("Bad Request"))
-                .andExpect(jsonPath("$.errorCode").value(errorCode.toString()));
-
-        verify(expenseService)
-                .addNewExpense(addNewExpenseRequest);
-    }
-
-    @Test
-    void shouldReturn400WhenSubcategoryCategoryMismatchExceptionWasThrown() throws Exception {
-        ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
-        String errorMessage = "Sub-category assignment not correct";
-        ErrorCode errorCode = ErrorCode.SUBCATEGORY_CATEGORY_MISMATCH;
-        AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
-                expenseFixture.getUserProfile().getUserId(),
-                expenseFixture.getUserExpenseCategory().getId(),
-                expenseFixture.getUserExpenseSubCategory().getId(),
-                expenseFixture.getUserPaymentMethod().getId(),
-                new Date(),
-                100d,
-                "comment"
-        );
-
-        when(expenseService.addNewExpense(addNewExpenseRequest))
-                .thenThrow(new ValidationException(errorMessage, errorCode));
-
-
-        mockMvc.perform(
-                        post(EXPENSES_ENDPOINT)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(addNewExpenseRequest))
-                )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
-                .andExpect(jsonPath("$.detail").value(errorMessage))
-                .andExpect(jsonPath("$.instance").value(EXPENSES_ENDPOINT))
-                .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.title").value("Bad Request"))
-                .andExpect(jsonPath("$.errorCode").value(errorCode.toString()));
-
-        verify(expenseService)
-                .addNewExpense(addNewExpenseRequest);
+                .addNewExpense(expenseFixture.getUserProfile(), addNewExpenseRequest);
     }
 
     @Test
@@ -274,7 +213,6 @@ public class ExpenseControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
-                                          "XuserId": 2,
                                           "XcategoryId": 1,
                                           "XsubCategoryId": 1,
                                           "XuserPaymentMethodId": 1,
@@ -286,7 +224,6 @@ public class ExpenseControllerTest {
                 )
                 .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.detail").value("Request contains invalid fields"))
-                .andExpect(jsonPath("$.errors.userId").value("must not be null"))
                 .andExpect(jsonPath("$.errors.categoryId").value("must not be null"))
                 .andExpect(jsonPath("$.errors.subCategoryId").value("must not be null"))
                 .andExpect(jsonPath("$.errors.userPaymentMethodId").value("must not be null"))

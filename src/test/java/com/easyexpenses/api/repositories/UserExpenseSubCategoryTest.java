@@ -25,9 +25,6 @@ public class UserExpenseSubCategoryTest {
     private UserExpenseCategoryRepository userExpenseCategoryRepository;
 
     @Autowired
-    private UserExpenseSubCategoryRepository userExpenseSubCategoryRepository;
-
-    @Autowired
     private EntityManager em;
 
     @Test
@@ -48,10 +45,9 @@ public class UserExpenseSubCategoryTest {
                 .build();
 
         userRepository.save(userProfile.getUser());
-        userExpenseCategoryRepository.save(userExpenseCategory);
-        userExpenseSubCategoryRepository.save(userExpenseSubCategory);
+        UserExpenseCategory savedUserExpenseCategory=userExpenseCategoryRepository.save(userExpenseCategory);
 
-        UserExpenseSubCategory savedUserExpenseSubCategory = userExpenseSubCategoryRepository.findById(userExpenseSubCategory.getId()).orElseThrow();
+        UserExpenseSubCategory savedUserExpenseSubCategory = savedUserExpenseCategory.getSubCategoriesRelatedWithThisCategory().stream().findFirst().orElseThrow();
         assertEquals(name.toUpperCase(), savedUserExpenseSubCategory.getName());
     }
 
@@ -75,10 +71,6 @@ public class UserExpenseSubCategoryTest {
 
         userRepository.save(userProfile.getUser());
         userExpenseCategoryRepository.save(userExpenseCategory);
-        userExpenseSubCategoryRepository.save(userExpenseSubCategory);
-
-        em.flush();
-        em.clear();
 
         UserExpenseSubCategory duplicateUserExpenseSubCategory = new UserExpenseSubCategoryBuilder()
                 .userProfile(userProfile)
@@ -87,7 +79,7 @@ public class UserExpenseSubCategoryTest {
                 .build();
 
         assertThrows(ConstraintViolationException.class, () -> {
-            userExpenseSubCategoryRepository.save(duplicateUserExpenseSubCategory);
+            userExpenseCategoryRepository.save(userExpenseCategory);
             em.flush();
             em.clear();
         });
@@ -111,8 +103,7 @@ public class UserExpenseSubCategoryTest {
                 .build();
 
         userRepository.save(firstUser.getUser());
-        userExpenseCategoryRepository.save(firstUserExpenseCategory);
-        userExpenseSubCategoryRepository.save(firstUserExpenseSubCategory);
+        UserExpenseCategory firstSavedUserExpenseCategory=userExpenseCategoryRepository.save(firstUserExpenseCategory);
 
         UserProfile secondUser = new UserProfileBuilder()
                 .user()
@@ -124,18 +115,14 @@ public class UserExpenseSubCategoryTest {
         UserExpenseSubCategory secondUserExpenseSubCategory = new UserExpenseSubCategoryBuilder()
                 .userProfile(secondUser)
                 .name(name)
-                .userExpenseCategory(firstUserExpenseCategory)
+                .userExpenseCategory(secondUserExpenseCategory)
                 .build();
 
         userRepository.save(secondUser.getUser());
-        userExpenseCategoryRepository.save(secondUserExpenseCategory);
-        userExpenseSubCategoryRepository.save(secondUserExpenseSubCategory);
+        UserExpenseCategory secondSavedUserExpenseCategory=userExpenseCategoryRepository.save(secondUserExpenseCategory);
 
-        em.flush();
-        em.clear();
-
-        UserExpenseSubCategory firstSavedUserExpenseSubCategory = userExpenseSubCategoryRepository.findById(firstUserExpenseSubCategory.getId()).orElseThrow();
-        UserExpenseSubCategory secondSavedUserExpenseSubCategory = userExpenseSubCategoryRepository.findById(secondUserExpenseSubCategory.getId()).orElseThrow();
+        UserExpenseSubCategory firstSavedUserExpenseSubCategory = firstSavedUserExpenseCategory.getSubCategoriesRelatedWithThisCategory().stream().findFirst().orElseThrow();
+        UserExpenseSubCategory secondSavedUserExpenseSubCategory = secondSavedUserExpenseCategory.getSubCategoriesRelatedWithThisCategory().stream().findFirst().orElseThrow();
         assertEquals(name.toUpperCase(), firstSavedUserExpenseSubCategory.getName());
         assertEquals(name.toUpperCase(), secondSavedUserExpenseSubCategory.getName());
     }

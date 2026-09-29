@@ -2,12 +2,8 @@ package com.easyexpenses.api.services;
 
 import com.easyexpenses.api.builders.*;
 import com.easyexpenses.api.dtos.AddNewExpenseRequest;
-import com.easyexpenses.api.entities.Expense;
-import com.easyexpenses.api.entities.UserProfile;
-import com.easyexpenses.api.entities.UserExpenseCategory;
-import com.easyexpenses.api.entities.UserPaymentMethod;
-import com.easyexpenses.api.errors.ErrorCode;
-import com.easyexpenses.api.errors.ValidationException;
+import com.easyexpenses.api.entities.*;
+import com.easyexpenses.api.errors.ResourceNotFoundException;
 import com.easyexpenses.api.fixtures.ExpenseFixture;
 import com.easyexpenses.api.mappers.ExpenseMapper;
 import com.easyexpenses.api.repositories.ExpenseRepository;
@@ -19,24 +15,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ExpenseServiceTest {
-
-    @Mock
-    private UserProfileService userProfileService;
-
-    @Mock
-    private UserPaymentMethodService userPaymentMethodService;
-
-    @Mock
-    private UserExpenseCategoryService userExpenseCategoryService;
-
-    @Mock
-    private UserExpenseSubCategoryService userExpenseSubCategoryService;
 
     @Mock
     private ExpenseRepository expenseRepository;
@@ -49,7 +32,7 @@ public class ExpenseServiceTest {
 
 
     @Test
-    void shouldThrowExceptionWhenUserIdIsNotConsistentAcrossDomain() {
+    void shouldThrowExceptionWhenUserPaymentMethodDoesNotBelongToUser() {
         ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
 
         UserProfile anotherUser = new UserProfileBuilder()
@@ -62,8 +45,37 @@ public class ExpenseServiceTest {
 
 
         AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
-                expenseFixture.getUserProfile().getUserId(),
                 expenseFixture.getUserExpenseCategory().getId(),
+                expenseFixture.getUserExpenseSubCategory().getId(),
+                anotherUserPaymentMethod.getId(),
+                new Date(),
+                100d,
+                "Test"
+        );
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            expenseService.addNewExpense(expenseFixture.getUserProfile(), addNewExpenseRequest);
+        });
+
+        verify(expenseRepository, never())
+                .save(any());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUserExpenseCategoryDoesNotBelongToUser() {
+        ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
+
+        UserProfile anotherUser = new UserProfileBuilder()
+                .user(2L)
+                .build();
+        UserExpenseCategory anotherUserExpenseCategory = new UserExpenseCategoryBuilder()
+                .id(2L)
+                .userProfile(anotherUser)
+                .build();
+
+
+        AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
+                anotherUserExpenseCategory.getId(),
                 expenseFixture.getUserExpenseSubCategory().getId(),
                 expenseFixture.getUserPaymentMethod().getId(),
                 new Date(),
@@ -71,28 +83,39 @@ public class ExpenseServiceTest {
                 "Test"
         );
 
-        //mocks behavior definition
-        when(userProfileService.getUserProfile(addNewExpenseRequest.userId()))
-                .thenReturn(expenseFixture.getUserProfile());
-
-        //wrong userProfile payment method
-        when(userPaymentMethodService.getUserPaymentMethod(addNewExpenseRequest.userPaymentMethodId()))
-                .thenReturn(anotherUserPaymentMethod);
-
-        when(userExpenseCategoryService.getUserExpenseCategory(addNewExpenseRequest.categoryId()))
-                .thenReturn(expenseFixture.getUserExpenseCategory());
-
-        when(userExpenseSubCategoryService.getUserExpenseSubCategory(addNewExpenseRequest.subCategoryId()))
-                .thenReturn(expenseFixture.getUserExpenseSubCategory());
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            expenseService.addNewExpense(addNewExpenseRequest);
+        assertThrows(ResourceNotFoundException.class, () -> {
+            expenseService.addNewExpense(expenseFixture.getUserProfile(), addNewExpenseRequest);
         });
 
-        assertEquals(
-                ErrorCode.INVALID_USER_RELATIONSHIP,
-                exception.getErrorCode()
+        verify(expenseRepository, never())
+                .save(any());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUserExpenseSubCategoryDoesNotBelongToUser() {
+        ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
+
+        UserProfile anotherUser = new UserProfileBuilder()
+                .user(2L)
+                .build();
+        UserExpenseSubCategory anotherUserExpenseSubCategory = new UserExpenseSubCategoryBuilder()
+                .id(2L)
+                .userProfile(anotherUser)
+                .build();
+
+
+        AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
+                expenseFixture.getUserExpenseCategory().getId(),
+                anotherUserExpenseSubCategory.getId(),
+                expenseFixture.getUserPaymentMethod().getId(),
+                new Date(),
+                100d,
+                "Test"
         );
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            expenseService.addNewExpense(expenseFixture.getUserProfile(), addNewExpenseRequest);
+        });
 
         verify(expenseRepository, never())
                 .save(any());
@@ -103,7 +126,6 @@ public class ExpenseServiceTest {
         ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
 
         AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
-                expenseFixture.getUserProfile().getUserId(),
                 expenseFixture.getUserExpenseCategory().getId(),
                 expenseFixture.getUserExpenseSubCategory().getId(),
                 expenseFixture.getUserPaymentMethod().getId(),
@@ -112,67 +134,8 @@ public class ExpenseServiceTest {
                 "Test"
         );
 
-        //mocks behavior definition
-        when(userProfileService.getUserProfile(addNewExpenseRequest.userId()))
-                .thenReturn(expenseFixture.getUserProfile());
-
-        when(userPaymentMethodService.getUserPaymentMethod(addNewExpenseRequest.userPaymentMethodId()))
-                .thenReturn(expenseFixture.getUserPaymentMethod());
-
-        when(userExpenseCategoryService.getUserExpenseCategory(addNewExpenseRequest.categoryId()))
-                .thenReturn(expenseFixture.getUserExpenseCategory());
-
-        when(userExpenseSubCategoryService.getUserExpenseSubCategory(addNewExpenseRequest.subCategoryId()))
-                .thenReturn(expenseFixture.getUserExpenseSubCategory());
-
-        expenseService.addNewExpense(addNewExpenseRequest);
+        expenseService.addNewExpense(expenseFixture.getUserProfile(), addNewExpenseRequest);
 
         verify(expenseRepository).save(any(Expense.class));
-    }
-
-    @Test
-    void shouldThrowExceptionWhenSubCategoryIsNotAssignedToProperCategory() {
-        ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
-        UserExpenseCategory anotherCategory = new UserExpenseCategoryBuilder()
-                .id(2L)
-                .userProfile(expenseFixture.getUserProfile())
-                .build();
-
-
-        AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
-                expenseFixture.getUserProfile().getUserId(),
-                expenseFixture.getUserExpenseCategory().getId(),
-                expenseFixture.getUserExpenseSubCategory().getId(),
-                expenseFixture.getUserPaymentMethod().getId(),
-                new Date(),
-                100d,
-                "Test"
-        );
-
-        //mocks behavior definition
-        when(userProfileService.getUserProfile(addNewExpenseRequest.userId()))
-                .thenReturn(expenseFixture.getUserProfile());
-
-        when(userPaymentMethodService.getUserPaymentMethod(addNewExpenseRequest.userPaymentMethodId()))
-                .thenReturn(expenseFixture.getUserPaymentMethod());
-
-        //wrong userProfile category
-        when(userExpenseCategoryService.getUserExpenseCategory(addNewExpenseRequest.categoryId()))
-                .thenReturn(anotherCategory);
-
-        when(userExpenseSubCategoryService.getUserExpenseSubCategory(addNewExpenseRequest.subCategoryId()))
-                .thenReturn(expenseFixture.getUserExpenseSubCategory());
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            expenseService.addNewExpense(addNewExpenseRequest);
-        });
-
-        assertEquals(
-                ErrorCode.SUBCATEGORY_CATEGORY_MISMATCH,
-                exception.getErrorCode()
-        );
-
-        verify(expenseRepository, never())
-                .save(any());
     }
 }
