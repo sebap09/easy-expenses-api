@@ -25,9 +25,6 @@ public class ExpenseDomainIntegrationTest {
     @Autowired
     private UserExpenseCategoryRepository userExpenseCategoryRepository;
 
-    @Autowired
-    private UserExpenseSubCategoryRepository userExpenseSubCategoryRepository;
-
     //required for flush() and clear() to be able to test whole database cycle instead of only persistence context
     @Autowired
     private EntityManager em;
@@ -63,7 +60,6 @@ public class ExpenseDomainIntegrationTest {
         userRepository.save(userProfile.getUser());
         userPaymentMethodRepository.save(userPaymentMethod);
         userExpenseCategoryRepository.save(userExpenseCategory);
-        userExpenseSubCategoryRepository.save(userExpenseSubCategory);
         expenseRepository.save(expense);
 
         //push from persistence context to actual db
@@ -216,7 +212,6 @@ public class ExpenseDomainIntegrationTest {
         userPaymentMethodRepository.save(card);
         userPaymentMethodRepository.save(cash);
         userExpenseCategoryRepository.save(userExpenseCategory);
-        userExpenseSubCategoryRepository.save(userExpenseSubCategory);
         expenseRepository.save(cardExpense);
         expenseRepository.save(cashExpense);
 

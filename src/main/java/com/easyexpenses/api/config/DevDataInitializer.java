@@ -16,8 +16,7 @@ public class DevDataInitializer {
     CommandLineRunner init(
             UserRepository userRepository,
             UserPaymentMethodRepository paymentMethodRepository,
-            UserExpenseCategoryRepository userExpenseCategoryRepository,
-            UserExpenseSubCategoryRepository userExpenseSubCategoryRepository
+            UserExpenseCategoryRepository userExpenseCategoryRepository
     ) {
         return args -> {
             User user = new UserBuilder()
@@ -71,12 +70,8 @@ public class DevDataInitializer {
             userRepository.save(user);
             paymentMethodRepository.save(card);
             userExpenseCategoryRepository.save(firstUserExpenseCategory);
-            userExpenseSubCategoryRepository.save(firstSubCategoryForFirstCategory);
-            userExpenseSubCategoryRepository.save(secondSubCategoryForFirstCategory);
 
             userExpenseCategoryRepository.save(secondUserExpenseCategory);
-            userExpenseSubCategoryRepository.save(firstSubCategoryForSecondCategory);
-            userExpenseSubCategoryRepository.save(secondSubCategoryForSecondCategory);
         };
     }
 }

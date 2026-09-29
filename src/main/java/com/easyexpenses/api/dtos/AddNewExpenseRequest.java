@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 
 public record AddNewExpenseRequest (
-        @NotNull Long userId,
         @NotNull Long categoryId,
         @NotNull Long subCategoryId,
         @NotNull Long userPaymentMethodId,
