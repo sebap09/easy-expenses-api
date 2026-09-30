@@ -39,7 +39,9 @@ public class SecurityConfigurationDev {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/h2-console",
-                                "/h2-console/**")
+                                "/h2-console/**",
+                                "/api-docs/**",
+                                "/swagger-ui/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated()
