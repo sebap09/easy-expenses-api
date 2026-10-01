@@ -8,10 +8,10 @@ import java.util.Set;
 
 @Entity
 @Table(
-        name = "user_expense_sub_category",
+        name = "user_expense_sub_categories",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        columnNames = {"userId", "name", "userExpenseCategoryId"}
+                        columnNames = {"user_id", "name", "user_expense_category_id"}
                 )
         }
 )
@@ -21,8 +21,16 @@ import java.util.Set;
 @NoArgsConstructor
 public class UserExpenseSubCategory {
     @Id
+    @SequenceGenerator(
+            name = "user_expense_sub_categories_seq",
+            sequenceName = "user_expense_sub_categories_seq",
+            allocationSize = 50
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "user_expense_sub_categories_seq"
+    )
     @Column(unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(nullable = false)
@@ -35,11 +43,11 @@ public class UserExpenseSubCategory {
     }
 
     @ManyToOne
-    @JoinColumn(name="userId", nullable=false)
+    @JoinColumn(name="user_id", nullable=false)
     private UserProfile userProfile;
 
     @ManyToOne
-    @JoinColumn(name="userExpenseCategoryId", nullable=false)
+    @JoinColumn(name="user_expense_category_id", nullable=false)
     private UserExpenseCategory userExpenseCategory;
 
     @OneToMany(mappedBy="userExpenseSubCategory")

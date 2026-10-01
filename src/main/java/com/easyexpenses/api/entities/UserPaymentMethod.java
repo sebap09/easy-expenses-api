@@ -8,10 +8,10 @@ import java.util.Set;
 
 @Entity
 @Table(
-        name = "user_payment_method",
+        name = "user_payment_methods",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        columnNames = {"userId", "name"}
+                        columnNames = {"user_id", "name"}
                 )
         }
 )
@@ -21,8 +21,16 @@ import java.util.Set;
 @NoArgsConstructor
 public class UserPaymentMethod {
     @Id
+    @SequenceGenerator(
+            name = "user_payment_methods_seq",
+            sequenceName = "user_payment_methods_seq",
+            allocationSize = 50
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "user_payment_methods_seq"
+    )
     @Column(unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(nullable = false)
@@ -35,7 +43,7 @@ public class UserPaymentMethod {
     }
 
     @ManyToOne
-    @JoinColumn(name="userId", nullable=false)
+    @JoinColumn(name="user_id", nullable=false)
     private UserProfile userProfile;
 
     @OneToMany(mappedBy="userPaymentMethod")

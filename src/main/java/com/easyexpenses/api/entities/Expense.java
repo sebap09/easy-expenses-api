@@ -6,31 +6,39 @@ import lombok.*;
 import java.util.Date;
 
 @Entity
-@Table(name="expense")
+@Table(name="expenses")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Expense {
     @Id
+    @SequenceGenerator(
+            name = "expenses_seq",
+            sequenceName = "expenses_seq",
+            allocationSize = 50
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "expenses_seq"
+    )
     @Column(unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="userId", nullable=false)
+    @JoinColumn(name="user_id", nullable=false)
     private UserProfile userProfile;
 
     @ManyToOne
-    @JoinColumn(name="userPaymentMethodId", nullable=false)
+    @JoinColumn(name="user_payment_method_id", nullable=false)
     private UserPaymentMethod userPaymentMethod;
 
     @ManyToOne
-    @JoinColumn(name="userExpenseCategoryId", nullable=false)
+    @JoinColumn(name="user_expense_category_id", nullable=false)
     private UserExpenseCategory userExpenseCategory;
 
     @ManyToOne
-    @JoinColumn(name="userExpenseSubCategoryId", nullable=false)
+    @JoinColumn(name="user_expense_sub_category_id", nullable=false)
     private UserExpenseSubCategory userExpenseSubCategory;
 
     private Date date;
