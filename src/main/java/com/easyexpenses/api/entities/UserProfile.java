@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name="user_profile")
+@Table(name="user_profiles")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -19,7 +19,7 @@ public class UserProfile {
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy="userProfile")
