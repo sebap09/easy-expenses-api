@@ -127,7 +127,10 @@ public class ExpenseControllerTest {
 
         List<ExpenseResponse> expenseResponses = List.of(expenseResponse);
 
-        when(expenseService.getAllExpenses())
+        when(userProfileService.findOrCreateUser(any(Jwt.class)))
+                .thenReturn(expenseFixture.getUserProfile());
+
+        when(expenseService.getAllExpenses(any(UserProfile.class)))
                 .thenReturn(expenseResponses);
 
 
@@ -154,7 +157,7 @@ public class ExpenseControllerTest {
                 .isEqualTo(expenseResponses);
 
         verify(expenseService)
-                .getAllExpenses();
+                .getAllExpenses(expenseFixture.getUserProfile());
     }
 
     @Test
