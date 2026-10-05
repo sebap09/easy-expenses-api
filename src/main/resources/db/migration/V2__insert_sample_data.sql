@@ -1,7 +1,7 @@
 WITH user_id_cte AS (
 INSERT INTO users (identity_issuer, identity_subject)
 VALUES (
-    'http://localhost:9090/realms/my-realm',
+    'http://keycloak:8080/realms/my-realm',
     'f759323e-5b47-44a6-8d0f-a8b5563cccd1'
     )
     RETURNING id AS user_id
