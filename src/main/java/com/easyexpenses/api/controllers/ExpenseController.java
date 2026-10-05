@@ -27,13 +27,13 @@ public class ExpenseController {
         this.userProfileService = userProfileService;
     }
 
-    // GET http://localhost:8080/api/v1/expenses
     @GetMapping
-    public ResponseEntity<List<ExpenseResponse>> getAllExpenses() {
-        return new ResponseEntity<>(expenseService.getAllExpenses(), HttpStatus.OK);
+    public ResponseEntity<List<ExpenseResponse>> getAllExpenses(@AuthenticationPrincipal Jwt jwt) {
+        UserProfile userProfile = userProfileService.findOrCreateUser(jwt);
+        List<ExpenseResponse> expenseResponse = expenseService.getAllExpenses(userProfile);
+        return new ResponseEntity<>(expenseResponse, HttpStatus.OK);
     }
 
-    // POST http://localhost:8080/api/v1/expenses
     @PostMapping
     public ResponseEntity<ExpenseResponse> addNewExpense(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody AddNewExpenseRequest addNewExpenseRequest) {
         UserProfile userProfile = userProfileService.findOrCreateUser(jwt);
