@@ -24,8 +24,8 @@ public class ExpenseService {
         this.expenseMapper = expenseMapper;
     }
 
-    public List<ExpenseResponse> getAllExpenses() {
-        return expenseRepository.findAll()
+    public List<ExpenseResponse> getAllExpenses(UserProfile userProfile) {
+        return expenseRepository.findAllByUserId(userProfile.getUserId())
                 .stream()
                 .map(expenseMapper::toResponse)
                 .toList();
