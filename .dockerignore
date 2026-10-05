@@ -1,0 +1,49 @@
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# Maven build output
+target/
+
+# Maven cache
+.m2/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker / Compose
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Documentation
+README.md
+docs/
+
+# Test reports / coverage
+surefire-reports/
+failsafe-reports/
+jacoco.exec
+
+# Temporary files
+*.tmp
+*.temp
