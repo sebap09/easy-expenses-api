@@ -1,0 +1,61 @@
+info:
+  name: 3. Create config
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: http://localhost:8081/api/v1/me
+  body:
+    type: json
+    data: |-
+      {
+          "paymentMethods": [
+              "Card",
+              "Cash"
+          ],
+          "categories": [
+              {
+                  "name": "Jedzenie",
+                  "subCategories": [
+                    "Zakupy",
+                    "Dostawa"
+                  ]
+              },
+            {
+                  "name": "Transport",
+                  "subCategories": [
+                    "Paliwo",
+                    "Parking",
+                    "Taxi"
+                  ]
+              }
+          ]
+      }
+  auth:
+    type: bearer
+    token: "{{jwt_token}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        try{
+        const payment_method_id = res.body.paymentMethods[0].id;
+        bru.setEnvVar("payment_method_id", payment_method_id);
+
+        const category_id = res.body.categories[0].id;
+        bru.setEnvVar("category_id", category_id);
+
+        const sub_category_id = res.body.categories[0].subcategories[0].id;
+        bru.setEnvVar("sub_category_id", sub_category_id);
+        }catch(e){
+          
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
