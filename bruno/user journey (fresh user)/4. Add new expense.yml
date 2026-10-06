@@ -1,0 +1,29 @@
+info:
+  name: 4. Add new expense
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: http://localhost:8081/api/v1/expenses
+  body:
+    type: json
+    data: |-
+      {
+        "categoryId": {{category_id}},
+        "subCategoryId": {{sub_category_id}},
+        "userPaymentMethodId": {{payment_method_id}},
+        "date": "2026-04-17",
+        "value": 100.19,
+        "comment": "comment"
+      }
+  auth:
+    type: bearer
+    token: "{{jwt_token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true

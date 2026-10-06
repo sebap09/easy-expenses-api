@@ -1,0 +1,7 @@
+info:
+  name: user journey (Test Data user)
+  type: folder
+  seq: 4
+
+request:
+  auth: inherit

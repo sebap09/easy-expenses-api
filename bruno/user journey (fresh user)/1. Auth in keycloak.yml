@@ -1,0 +1,34 @@
+info:
+  name: 1. Auth in keycloak
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://keycloak:8080/realms/my-realm/protocol/openid-connect/token
+  body:
+    type: form-urlencoded
+    data:
+      - name: client_id
+        value: easy-expenses
+      - name: username
+        value: sebastian
+      - name: password
+        value: password
+      - name: grant_type
+        value: password
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const token = res.body.token || res.body.access_token;
+        bru.setEnvVar("jwt_token", token);
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true

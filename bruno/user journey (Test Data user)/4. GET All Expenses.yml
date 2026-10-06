@@ -1,0 +1,18 @@
+info:
+  name: 4. GET All Expenses
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: http://localhost:8081/api/v1/expenses
+  auth:
+    type: bearer
+    token: "{{jwt_token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
