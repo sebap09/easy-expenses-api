@@ -1,0 +1,28 @@
+info:
+  name: 5. GET All Expenses with Pagination and Sorting
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: http://localhost:8081/api/v1/expenses?page=1&size=10&sort=id,desc
+  params:
+    - name: page
+      value: "1"
+      type: query
+    - name: size
+      value: "10"
+      type: query
+    - name: sort
+      value: id,desc
+      type: query
+  auth:
+    type: bearer
+    token: "{{jwt_token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true

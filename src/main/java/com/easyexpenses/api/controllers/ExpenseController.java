@@ -7,6 +7,7 @@ import com.easyexpenses.api.services.ExpenseService;
 import com.easyexpenses.api.services.UserProfileService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,9 +29,9 @@ public class ExpenseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ExpenseResponse>> getAllExpenses(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<List<ExpenseResponse>> getAllExpensesPaginated(@AuthenticationPrincipal Jwt jwt, Pageable pageable) {
         UserProfile userProfile = userProfileService.findOrCreateUser(jwt);
-        List<ExpenseResponse> expenseResponse = expenseService.getAllExpenses(userProfile);
+        List<ExpenseResponse> expenseResponse = expenseService.getAllExpensesPaginated(userProfile, pageable);
         return new ResponseEntity<>(expenseResponse, HttpStatus.OK);
     }
 

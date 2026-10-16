@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -130,7 +131,7 @@ public class ExpenseControllerTest {
         when(userProfileService.findOrCreateUser(any(Jwt.class)))
                 .thenReturn(expenseFixture.getUserProfile());
 
-        when(expenseService.getAllExpenses(any(UserProfile.class)))
+        when(expenseService.getAllExpensesPaginated(any(UserProfile.class), any(Pageable.class)))
                 .thenReturn(expenseResponses);
 
 
@@ -157,7 +158,7 @@ public class ExpenseControllerTest {
                 .isEqualTo(expenseResponses);
 
         verify(expenseService)
-                .getAllExpenses(expenseFixture.getUserProfile());
+                .getAllExpensesPaginated(any(), any(Pageable.class));
     }
 
     @Test
