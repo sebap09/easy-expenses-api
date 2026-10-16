@@ -8,6 +8,7 @@ import com.easyexpenses.api.errors.ResourceNotFoundException;
 import com.easyexpenses.api.mappers.ExpenseMapper;
 import com.easyexpenses.api.repositories.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,8 +25,9 @@ public class ExpenseService {
         this.expenseMapper = expenseMapper;
     }
 
-    public List<ExpenseResponse> getAllExpenses(UserProfile userProfile) {
-        return expenseRepository.findAllByUserId(userProfile.getUserId())
+    public List<ExpenseResponse> getAllExpensesPaginated(UserProfile userProfile, Pageable pageable) {
+        return expenseRepository.findAllByUserIdWithPagination(userProfile.getUserId(), pageable)
+                .getContent()
                 .stream()
                 .map(expenseMapper::toResponse)
                 .toList();
