@@ -137,10 +137,11 @@ The REST API is versioned under `/api/v1`.
 
 #### Expenses
 
-| Method | Endpoint           | Description       |
-| ------ | ------------------ | ----------------- |
-| `GET`  | `/api/v1/expenses` | Get expenses      |
-| `POST` | `/api/v1/expenses` | Add a new expense |
+| Method | Endpoint                  | Description                       |
+| ------ |---------------------------|-----------------------------------|
+| `GET`  | `/api/v1/expenses/all`    | Get list of all expenses          |
+| `GET`  | `/api/v1/expenses/search` | Get expenses paginated and sorted |
+| `POST` | `/api/v1/expenses`        | Add a new expense                 |
 
 ### API Documentation
 

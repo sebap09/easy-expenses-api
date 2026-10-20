@@ -5,13 +5,13 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8081/api/v1/expenses?page=1&size=10&sort=id,desc
+  url: http://localhost:8081/api/v1/expenses/search?page=2&size=2&sort=id,desc
   params:
     - name: page
-      value: "1"
+      value: "2"
       type: query
     - name: size
-      value: "10"
+      value: "2"
       type: query
     - name: sort
       value: id,desc

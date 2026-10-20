@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8081/api/v1/expenses
+  url: http://localhost:8081/api/v1/expenses/all
   auth:
     type: bearer
     token: "{{jwt_token}}"
