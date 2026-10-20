@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -131,12 +130,12 @@ public class ExpenseControllerTest {
         when(userProfileService.findOrCreateUser(any(Jwt.class)))
                 .thenReturn(expenseFixture.getUserProfile());
 
-        when(expenseService.getAllExpensesPaginated(any(UserProfile.class), any(Pageable.class)))
+        when(expenseService.getAllExpenses(any(UserProfile.class)))
                 .thenReturn(expenseResponses);
 
 
         MvcResult result = mockMvc.perform(
-                        get(EXPENSES_ENDPOINT)
+                        get(EXPENSES_ENDPOINT + "/all")
                                 .with(jwt())
 
                 )
@@ -158,7 +157,7 @@ public class ExpenseControllerTest {
                 .isEqualTo(expenseResponses);
 
         verify(expenseService)
-                .getAllExpensesPaginated(any(), any(Pageable.class));
+                .getAllExpenses(any());
     }
 
     @Test

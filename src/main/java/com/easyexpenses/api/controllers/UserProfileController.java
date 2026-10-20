@@ -26,12 +26,14 @@ public class UserProfileController {
     @GetMapping
     public ResponseEntity<UserProfileResponse> me(@AuthenticationPrincipal Jwt jwt) {
         UserProfile userProfile = userProfileService.findOrCreateUser(jwt);
-        return new ResponseEntity<>(userProfileService.getUserProfileData(userProfile), HttpStatus.OK);
+        return ResponseEntity.ok(userProfileService.getUserProfileData(userProfile));
     }
 
     @PostMapping
     public ResponseEntity<UserProfileResponse> saveConfiguration(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody UserProfileRequest userProfileRequest) {
         UserProfile userProfile = userProfileService.findOrCreateUser(jwt);
-        return new ResponseEntity<>(userProfileService.setUserProfileData(userProfile, userProfileRequest), HttpStatus.OK);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(userProfileService.setUserProfileData(userProfile, userProfileRequest));
     }
 }

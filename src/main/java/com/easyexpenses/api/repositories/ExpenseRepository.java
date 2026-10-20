@@ -7,9 +7,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
+    @Query("""
+        SELECT e
+        FROM Expense e
+        WHERE e.userProfile.userId = :userId
+    """)
+    List<Expense> findAllByUserId(Long userId);
+
     @Query("""
         SELECT e
         FROM Expense e
