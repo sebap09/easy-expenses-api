@@ -6,11 +6,8 @@ import com.easyexpenses.api.entities.UserExpenseCategory;
 import com.easyexpenses.api.entities.UserPaymentMethod;
 import com.easyexpenses.api.entities.UserProfile;
 import com.easyexpenses.api.errors.ErrorCode;
-import com.easyexpenses.api.errors.ResourceNotFoundException;
 import com.easyexpenses.api.errors.ValidationException;
 import com.easyexpenses.api.mappers.UserProfileMapper;
-import com.easyexpenses.api.repositories.UserProfileRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
@@ -18,26 +15,16 @@ import java.util.List;
 
 @Service
 public class UserProfileService {
-    private final UserProfileRepository userProfileRepository;
     private final UserService userService;
     private final UserProfileMapper userProfileMapper;
     private final UserPaymentMethodService userPaymentMethodService;
     private final UserExpenseCategoryService userExpenseCategoryService;
 
-    @Autowired
-    public UserProfileService(UserProfileRepository userProfileRepository, UserService userService, UserProfileMapper userProfileMapper, UserPaymentMethodService userPaymentMethodService, UserExpenseCategoryService userExpenseCategoryService) {
-        this.userProfileRepository = userProfileRepository;
+    public UserProfileService(UserService userService, UserProfileMapper userProfileMapper, UserPaymentMethodService userPaymentMethodService, UserExpenseCategoryService userExpenseCategoryService) {
         this.userService = userService;
         this.userProfileMapper = userProfileMapper;
         this.userPaymentMethodService = userPaymentMethodService;
         this.userExpenseCategoryService = userExpenseCategoryService;
-    }
-
-    public UserProfile getUserProfile(Long id){
-        return userProfileRepository.findByUserId(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "User not found: " + id));
     }
 
     public UserProfile findOrCreateUser(Jwt jwt){
