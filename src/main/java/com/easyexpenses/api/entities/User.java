@@ -49,7 +49,9 @@ public class User {
 
     @OneToOne(
             mappedBy = "user",
-            cascade = CascadeType.PERSIST
+            cascade = CascadeType.PERSIST,
+            fetch = FetchType.LAZY,
+            optional = false
     )
     private UserProfile userProfile;
 

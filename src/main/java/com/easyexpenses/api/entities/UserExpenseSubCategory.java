@@ -42,11 +42,11 @@ public class UserExpenseSubCategory {
         name = name.toUpperCase();
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="user_id", nullable=false)
     private UserProfile userProfile;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="user_expense_category_id", nullable=false)
     private UserExpenseCategory userExpenseCategory;
 

@@ -42,7 +42,7 @@ public class UserExpenseCategory {
         name = name.toUpperCase();
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="user_id", nullable=false)
     private UserProfile userProfile;
 

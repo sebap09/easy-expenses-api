@@ -25,19 +25,19 @@ public class Expense {
     @Column(unique = true, nullable = false)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="user_id", nullable=false)
     private UserProfile userProfile;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="user_payment_method_id", nullable=false)
     private UserPaymentMethod userPaymentMethod;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="user_expense_category_id", nullable=false)
     private UserExpenseCategory userExpenseCategory;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="user_expense_sub_category_id", nullable=false)
     private UserExpenseSubCategory userExpenseSubCategory;
 
