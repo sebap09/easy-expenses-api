@@ -11,7 +11,7 @@ import java.util.Set;
         name = "user_expense_sub_categories",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        columnNames = {"user_id", "name", "user_expense_category_id"}
+                        columnNames = {"name", "user_expense_category_id"}
                 )
         }
 )
@@ -41,10 +41,6 @@ public class UserExpenseSubCategory {
     private void normalize() {
         name = name.toUpperCase();
     }
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name="user_id", nullable=false)
-    private UserProfile userProfile;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="user_expense_category_id", nullable=false)

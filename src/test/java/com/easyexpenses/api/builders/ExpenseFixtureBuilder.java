@@ -25,7 +25,6 @@ public class ExpenseFixtureBuilder {
         UserExpenseSubCategory subCategory =
                 new UserExpenseSubCategoryBuilder()
                         .id(1L)
-                        .userProfile(userProfile)
                         .userExpenseCategory(category)
                         .build();
 

@@ -34,10 +34,6 @@ public class UserProfile {
     @Setter(AccessLevel.NONE)
     private Set<UserExpenseCategory> userExpenseCategories = new HashSet<>();
 
-    @OneToMany(mappedBy="userProfile")
-    @Setter(AccessLevel.NONE)
-    private Set<UserExpenseSubCategory> userExpenseSubCategories = new HashSet<>();
-
     public void addNewExpense(Expense expense){
         this.expenses.add(expense);
         expense.setUserProfile(this);
@@ -51,10 +47,5 @@ public class UserProfile {
     public void addNewUserCategory(UserExpenseCategory userExpenseCategory){
         this.userExpenseCategories.add(userExpenseCategory);
         userExpenseCategory.setUserProfile(this);
-    }
-
-    public void addNewUserSubCategory(UserExpenseSubCategory userExpenseSubCategory){
-        this.userExpenseSubCategories.add(userExpenseSubCategory);
-        userExpenseSubCategory.setUserProfile(this);
     }
 }

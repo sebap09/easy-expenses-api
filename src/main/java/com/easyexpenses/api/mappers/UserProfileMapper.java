@@ -64,7 +64,6 @@ public class UserProfileMapper {
             categories.add(userExpenseCategory);
             for(String subCategory: category.subCategories()){
                 new UserExpenseSubCategoryBuilder()
-                        .userProfile(userProfile)
                         .name(subCategory)
                         .userExpenseCategory(userExpenseCategory)
                         .build();
