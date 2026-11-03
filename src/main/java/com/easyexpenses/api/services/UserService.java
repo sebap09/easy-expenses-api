@@ -18,23 +18,23 @@ public class UserService {
     }
 
     @Transactional
-    public UserProfile findOrCreateUser(Jwt jwt){
+    public Long findOrCreateUser(Jwt jwt){
         String identityIssuer = jwt.getIssuer().toString();
         String identitySubject = jwt.getSubject();
-
-        return userRepository
+        User user = userRepository
                 .findByIdentityIssuerAndIdentitySubject(identityIssuer, identitySubject)
-                .map(User::getUserProfile)
                 .orElseGet(() -> {
-                    User user = new User();
-                    user.setIdentityIssuer(identityIssuer);
-                    user.setIdentitySubject(identitySubject);
+                    User newUser = new User();
+                    newUser.setIdentityIssuer(identityIssuer);
+                    newUser.setIdentitySubject(identitySubject);
 
                     UserProfile userProfile = new UserProfile();
-                    user.setUserProfile(userProfile);
-                    userRepository.save(user);
+                    newUser.setUserProfile(userProfile);
+                    userRepository.save(newUser);
 
-                    return userProfile;
+                    return newUser;
                 });
+
+        return user.getId();
     }
 }

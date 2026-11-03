@@ -8,39 +8,38 @@ import com.easyexpenses.api.entities.UserProfile;
 import com.easyexpenses.api.errors.ErrorCode;
 import com.easyexpenses.api.errors.ValidationException;
 import com.easyexpenses.api.mappers.UserProfileMapper;
-import org.springframework.security.oauth2.jwt.Jwt;
+import com.easyexpenses.api.repositories.UserProfileRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class UserProfileService {
-    private final UserService userService;
+    private final UserProfileRepository userProfileRepository;
     private final UserProfileMapper userProfileMapper;
     private final UserPaymentMethodService userPaymentMethodService;
     private final UserExpenseCategoryService userExpenseCategoryService;
 
-    public UserProfileService(UserService userService, UserProfileMapper userProfileMapper, UserPaymentMethodService userPaymentMethodService, UserExpenseCategoryService userExpenseCategoryService) {
-        this.userService = userService;
+    public UserProfileService(UserProfileRepository userProfileRepository, UserProfileMapper userProfileMapper, UserPaymentMethodService userPaymentMethodService, UserExpenseCategoryService userExpenseCategoryService) {
+        this.userProfileRepository = userProfileRepository;
         this.userProfileMapper = userProfileMapper;
         this.userPaymentMethodService = userPaymentMethodService;
         this.userExpenseCategoryService = userExpenseCategoryService;
     }
 
-    public UserProfile findOrCreateUser(Jwt jwt){
-        return userService.findOrCreateUser(jwt);
+    public UserProfile getUserProfileById(Long userId){
+        return userProfileRepository.findById(userId).orElseThrow();
     }
 
-    public UserProfileResponse getUserProfileData(UserProfile userProfile){
-        Long userId = userProfile.getUserId();
-
+    public UserProfileResponse getUserProfileData(Long userId){
         List<UserPaymentMethod> paymentMethods = userPaymentMethodService.getAllUserPaymentMethods(userId);
         List<UserExpenseCategory> categories = userExpenseCategoryService.getAllUserExpenseCategories(userId);
 
         return userProfileMapper.toResponse(paymentMethods, categories);
     }
 
-    public UserProfileResponse setUserProfileData(UserProfile userProfile, UserProfileRequest userProfileRequest) {
+    public UserProfileResponse setUserProfileData(Long userId, UserProfileRequest userProfileRequest) {
+        UserProfile userProfile = getUserProfileById(userId);
         if (!isConfigEmpty(userProfile))
             throw new ValidationException("Config already exists for this user", ErrorCode.CONFIG_ALREADY_EXISTS);
 
@@ -54,7 +53,7 @@ public class UserProfileService {
     }
 
     private boolean isConfigEmpty(UserProfile userProfile){
-        UserProfileResponse userProfileResponse = getUserProfileData(userProfile);
+        UserProfileResponse userProfileResponse = getUserProfileData(userProfile.getUserId());
         return userProfileResponse.categories().isEmpty() && userProfileResponse.paymentMethods().isEmpty();
     }
 }
