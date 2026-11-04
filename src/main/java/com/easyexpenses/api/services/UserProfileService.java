@@ -10,8 +10,10 @@ import com.easyexpenses.api.errors.ValidationException;
 import com.easyexpenses.api.mappers.UserProfileMapper;
 import com.easyexpenses.api.repositories.UserProfileRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserProfileService {
@@ -31,10 +33,12 @@ public class UserProfileService {
         return userProfileRepository.findById(userId).orElseThrow();
     }
 
+    @Transactional(readOnly = true)
     public UserProfileResponse getUserProfileData(Long userId){
-        List<UserPaymentMethod> paymentMethods = userPaymentMethodService.getAllUserPaymentMethods(userId);
-        List<UserExpenseCategory> categories = userExpenseCategoryService.getAllUserExpenseCategories(userId);
+        UserProfile userProfile = getUserProfileById(userId);;
 
+        Set<UserPaymentMethod> paymentMethods = userProfile.getUserPaymentMethods();
+        Set<UserExpenseCategory> categories = userExpenseCategoryService.getAllWithUserSubExpenseCategoriesByUserId(userId);
         return userProfileMapper.toResponse(paymentMethods, categories);
     }
 

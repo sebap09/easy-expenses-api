@@ -17,11 +17,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 
 @Service
 public class UserProfileMapper {
-    public UserProfileResponse toResponse(List<UserPaymentMethod> userPaymentMethods, List<UserExpenseCategory> userExpenseCategories) {
+    public UserProfileResponse toResponse(Set<UserPaymentMethod> userPaymentMethods, Set<UserExpenseCategory> userExpenseCategories) {
         List<PaymentMethodRes> paymentMethods = userPaymentMethods.stream()
                 .map(userPaymentMethod -> new PaymentMethodRes(
                         userPaymentMethod.getId(),
@@ -33,9 +33,6 @@ public class UserProfileMapper {
                         userExpenseCategory.getId(),
                         userExpenseCategory.getName(),
                         userExpenseCategory.getSubCategoriesRelatedWithThisCategory().stream()
-                                .filter(userExpenseSubCategory -> Objects.equals(
-                                        userExpenseSubCategory.getUserExpenseCategory().getId(),
-                                        userExpenseCategory.getId()))
                                 .map(userExpenseSubCategory -> new SubCategoryRes(
                                         userExpenseSubCategory.getId(),
                                         userExpenseSubCategory.getUserExpenseCategory().getId(),

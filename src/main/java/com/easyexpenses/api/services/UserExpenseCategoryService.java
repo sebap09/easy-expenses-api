@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserExpenseCategoryService {
@@ -16,8 +17,8 @@ public class UserExpenseCategoryService {
         this.userExpenseCategoryRepository = userExpenseCategoryRepository;
     }
 
-    public List<UserExpenseCategory> getAllUserExpenseCategories(Long userId) {
-        return userExpenseCategoryRepository.findAllByUserId(userId);
+    public Set<UserExpenseCategory> getAllWithUserSubExpenseCategoriesByUserId(Long userId) {
+        return userExpenseCategoryRepository.joinFetchCategoriesAndSubcategoriesAndFilterByUserId(userId);
     }
 
     public List<UserExpenseCategory> saveAll(List<UserExpenseCategory> categories) {
