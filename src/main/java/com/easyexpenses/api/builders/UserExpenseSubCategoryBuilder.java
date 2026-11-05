@@ -1,37 +1,20 @@
 package com.easyexpenses.api.builders;
 
-import com.easyexpenses.api.entities.UserExpenseCategory;
 import com.easyexpenses.api.entities.UserExpenseSubCategory;
 
 public class UserExpenseSubCategoryBuilder {
 
-    private Long id;
-    private String name = "Jedzenie/kosmetyki/chemia/inne";
-    private UserExpenseCategory userExpenseCategory;
-
-    public UserExpenseSubCategoryBuilder id(Long id) {
-        this.id = id;
-        return this;
-    }
+    private String name;
 
     public UserExpenseSubCategoryBuilder name(String name) {
         this.name = name;
         return this;
     }
 
-    public UserExpenseSubCategoryBuilder userExpenseCategory(UserExpenseCategory userExpenseCategory) {
-        this.userExpenseCategory = userExpenseCategory;
-        return this;
-    }
-
     public UserExpenseSubCategory build() {
         UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategory();
-        userExpenseSubCategory.setId(id);
         userExpenseSubCategory.setName(name);
 
-        if (userExpenseCategory != null) {
-            userExpenseCategory.addNewSubCategoryRelatedWithThisCategory(userExpenseSubCategory);
-        }
         return userExpenseSubCategory;
     }
 }

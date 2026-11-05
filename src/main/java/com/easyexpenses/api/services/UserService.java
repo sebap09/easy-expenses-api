@@ -1,5 +1,6 @@
 package com.easyexpenses.api.services;
 
+import com.easyexpenses.api.builders.UserBuilder;
 import com.easyexpenses.api.entities.User;
 import com.easyexpenses.api.entities.UserProfile;
 import com.easyexpenses.api.repositories.UserRepository;
@@ -24,9 +25,10 @@ public class UserService {
         User user = userRepository
                 .findByIdentityIssuerAndIdentitySubject(identityIssuer, identitySubject)
                 .orElseGet(() -> {
-                    User newUser = new User();
-                    newUser.setIdentityIssuer(identityIssuer);
-                    newUser.setIdentitySubject(identitySubject);
+                    User newUser = new UserBuilder()
+                            .identityIssuer(identityIssuer)
+                            .identitySubject(identitySubject)
+                                    .build();
 
                     UserProfile userProfile = new UserProfile();
                     newUser.setUserProfile(userProfile);
