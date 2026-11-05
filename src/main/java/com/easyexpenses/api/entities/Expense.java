@@ -41,7 +41,12 @@ public class Expense {
     @JoinColumn(name="user_expense_sub_category_id", nullable=false)
     private UserExpenseSubCategory userExpenseSubCategory;
 
+    @Column(name = "date")
     private Date date;
+
+    @Column(name = "value")
     private Double value;
+
+    @Column(name = "comment")
     private String comment;
 }

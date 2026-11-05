@@ -36,12 +36,6 @@ public class UserExpenseCategory {
     @Column(nullable = false)
     private String name;
 
-    @PrePersist
-    @PreUpdate
-    private void normalize() {
-        name = name.toUpperCase();
-    }
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="user_id", nullable=false)
     private UserProfile userProfile;
@@ -51,9 +45,13 @@ public class UserExpenseCategory {
     private Set<Expense> expensesRelatedWithThisCategory = new HashSet<>();
 
     @OneToMany(mappedBy="userExpenseCategory",
-            cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+            cascade = { CascadeType.PERSIST, CascadeType.MERGE})
     @Setter(AccessLevel.NONE)
     private Set<UserExpenseSubCategory> subCategoriesRelatedWithThisCategory = new HashSet<>();
+
+    public void setName(String name){
+        this.name = (name != null) ? name.toUpperCase() : null;
+    }
 
     public void addNewExpenseRelatedWithThisCategory(Expense expense){
         this.expensesRelatedWithThisCategory.add(expense);

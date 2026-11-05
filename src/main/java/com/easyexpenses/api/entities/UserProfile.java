@@ -26,13 +26,16 @@ public class UserProfile {
     @Setter(AccessLevel.NONE)
     private Set<Expense> expenses = new HashSet<>();
 
-    @OneToMany(mappedBy="userProfile")
+    @OneToMany(mappedBy="userProfile", cascade = { CascadeType.PERSIST, CascadeType.MERGE})
     @Setter(AccessLevel.NONE)
     private Set<UserPaymentMethod> userPaymentMethods = new HashSet<>();
 
-    @OneToMany(mappedBy="userProfile")
+    @OneToMany(mappedBy="userProfile", cascade = { CascadeType.PERSIST, CascadeType.MERGE})
     @Setter(AccessLevel.NONE)
     private Set<UserExpenseCategory> userExpenseCategories = new HashSet<>();
+
+    @Column(name = "is_completed", nullable = false)
+    private boolean isCompleted = false;
 
     public void addNewExpense(Expense expense){
         this.expenses.add(expense);

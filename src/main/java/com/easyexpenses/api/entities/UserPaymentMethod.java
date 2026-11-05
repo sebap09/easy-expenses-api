@@ -36,12 +36,6 @@ public class UserPaymentMethod {
     @Column(nullable = false)
     private String name;
 
-    @PrePersist
-    @PreUpdate
-    private void normalize() {
-        name = name.toUpperCase();
-    }
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="user_id", nullable=false)
     private UserProfile userProfile;
@@ -49,6 +43,10 @@ public class UserPaymentMethod {
     @OneToMany(mappedBy="userPaymentMethod")
     @Setter(AccessLevel.NONE)
     private Set<Expense> expensesRelatedWithThisUserPaymentMethod = new HashSet<>();
+
+    public void setName(String name){
+        this.name = (name != null) ? name.toUpperCase() : null;
+    }
 
     public void addNewExpenseRelatedWithThisUserPaymentMethod(Expense expense){
         this.expensesRelatedWithThisUserPaymentMethod.add(expense);
