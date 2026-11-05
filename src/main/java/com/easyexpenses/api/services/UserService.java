@@ -31,6 +31,8 @@ public class UserService {
                                     .build();
 
                     UserProfile userProfile = new UserProfile();
+                    userProfile.setCompleted(false);
+
                     newUser.setUserProfile(userProfile);
                     userRepository.save(newUser);
 

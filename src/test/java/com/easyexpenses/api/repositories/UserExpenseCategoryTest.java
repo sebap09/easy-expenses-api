@@ -1,7 +1,9 @@
 package com.easyexpenses.api.repositories;
 
-import com.easyexpenses.api.builders.UserProfileBuilder;
+import com.easyexpenses.api.builders.ExpenseFixtureBuilder;
+import com.easyexpenses.api.builders.UserBuilder;
 import com.easyexpenses.api.builders.UserExpenseCategoryBuilder;
+import com.easyexpenses.api.entities.User;
 import com.easyexpenses.api.entities.UserProfile;
 import com.easyexpenses.api.entities.UserExpenseCategory;
 import jakarta.persistence.EntityManager;
@@ -37,15 +39,20 @@ public class UserExpenseCategoryTest {
 
     @Test
     void shouldConvertNameToUppercase() {
-        UserProfile userProfile = new UserProfileBuilder()
-                .user()
+        User user = new UserBuilder()
+                .identityIssuer("issuer")
+                .identitySubject(ExpenseFixtureBuilder.getRandomSubject())
                 .build();
+
+        UserProfile userProfile = new UserProfile();
+        userProfile.setCompleted(false);
+        user.setUserProfile(userProfile);
 
         String name = "Shopping";
         UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
-                .userProfile(userProfile)
                 .name(name)
                 .build();
+        userProfile.addNewUserCategory(userExpenseCategory);
 
         userRepository.save(userProfile.getUser());
         userExpenseCategoryRepository.save(userExpenseCategory);
@@ -56,27 +63,26 @@ public class UserExpenseCategoryTest {
 
     @Test
     void shouldThrowExceptionWhenNameIsNotUnique() {
-        //entities & relationships data
-        UserProfile userProfile = new UserProfileBuilder()
-                .user()
+        User user = new UserBuilder()
+                .identityIssuer("issuer")
+                .identitySubject(ExpenseFixtureBuilder.getRandomSubject())
                 .build();
+
+        UserProfile userProfile = new UserProfile();
+        userProfile.setCompleted(false);
+        user.setUserProfile(userProfile);
 
         String name = "Shopping";
         UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
-                .userProfile(userProfile)
                 .name(name)
                 .build();
+        userProfile.addNewUserCategory(userExpenseCategory);
 
-        userRepository.save(userProfile.getUser());
-        userExpenseCategoryRepository.save(userExpenseCategory);
-
-        em.flush();
-        em.clear();
 
         UserExpenseCategory duplicateUserExpenseCategory = new UserExpenseCategoryBuilder()
-                .userProfile(userProfile)
                 .name(name)
                 .build();
+        userProfile.addNewUserCategory(userExpenseCategory);
 
         assertThrows(ConstraintViolationException.class, () -> {
             userExpenseCategoryRepository.save(duplicateUserExpenseCategory);
@@ -87,28 +93,39 @@ public class UserExpenseCategoryTest {
 
     @Test
     void shouldAllowTheSameNameForDifferentUsers() {
-        UserProfile firstUser = new UserProfileBuilder()
-                .user()
+        User firstUser = new UserBuilder()
+                .identityIssuer("issuer")
+                .identitySubject(ExpenseFixtureBuilder.getRandomSubject())
                 .build();
+
+        UserProfile firstUserProfile = new UserProfile();
+        firstUserProfile.setCompleted(false);
+        firstUser.setUserProfile(firstUserProfile);
 
         String name = "Shopping";
         UserExpenseCategory firstUserExpenseCategory = new UserExpenseCategoryBuilder()
-                .userProfile(firstUser)
                 .name(name)
                 .build();
+        firstUserProfile.addNewUserCategory(firstUserExpenseCategory);
 
-        userRepository.save(firstUser.getUser());
+        userRepository.save(firstUser);
         userExpenseCategoryRepository.save(firstUserExpenseCategory);
 
-        UserProfile secondUser = new UserProfileBuilder()
-                .user()
-                .build();
-        UserExpenseCategory secondUserExpenseCategory = new UserExpenseCategoryBuilder()
-                .userProfile(secondUser)
-                .name(name)
+        User secondUser = new UserBuilder()
+                .identityIssuer("issuer")
+                .identitySubject(ExpenseFixtureBuilder.getRandomSubject())
                 .build();
 
-        userRepository.save(secondUser.getUser());
+        UserProfile secondUserProfile = new UserProfile();
+        secondUserProfile.setCompleted(false);
+        secondUser.setUserProfile(secondUserProfile);
+
+        UserExpenseCategory secondUserExpenseCategory = new UserExpenseCategoryBuilder()
+                .name(name)
+                .build();
+        secondUserProfile.addNewUserCategory(secondUserExpenseCategory);
+
+        userRepository.save(secondUser);
         userExpenseCategoryRepository.save(secondUserExpenseCategory);
 
         em.flush();

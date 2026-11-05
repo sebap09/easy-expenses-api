@@ -12,6 +12,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
+import java.util.Date;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
@@ -41,35 +43,46 @@ public class ExpenseDomainIntegrationTest {
 
     @Test
     void shouldPersistExpenseWithDomain() {
-        //entities & relationships data
-        UserProfile userProfile = new UserProfileBuilder()
-                .user()
+        User user = new UserBuilder()
+                .identityIssuer("issuer")
+                .identitySubject(ExpenseFixtureBuilder.getRandomSubject())
                 .build();
 
+        UserProfile userProfile = new UserProfile();
+        userProfile.setCompleted(true);
+        user.setUserProfile(userProfile);
+
+        String cash = "Cash";
         UserPaymentMethod userPaymentMethod = new UserPaymentMethodBuilder()
-                .userProfile(userProfile)
+                .name(cash)
                 .build();
+        userProfile.addNewUserPaymentMethod(userPaymentMethod);
 
+        String name = "Grocery";
         UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
-                .userProfile(userProfile)
+                .name(name)
                 .build();
+        userProfile.addNewUserCategory(userExpenseCategory);
 
         UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategoryBuilder()
-                .userProfile(userProfile)
-                .userExpenseCategory(userExpenseCategory)
+                .name("UESC")
                 .build();
+        userExpenseCategory.addNewSubCategoryRelatedWithThisCategory(userExpenseSubCategory);
+
+        userRepository.save(userProfile.getUser());
 
         Expense expense = new ExpenseBuilder()
-                .userProfile(userProfile)
-                .userPaymentMethod(userPaymentMethod)
-                .userExpenseCategory(userExpenseCategory)
-                .userExpenseSubCategory(userExpenseSubCategory)
+                .comment("comment")
+                .date(new Date())
+                .value(100d)
                 .build();
 
+        expense.setUserPaymentMethod(userPaymentMethod);
+        expense.setUserExpenseCategory(userExpenseCategory);
+        expense.setUserExpenseSubCategory(userExpenseSubCategory);
+        userProfile.addNewExpense(expense);
+
         //saving entities to db
-        userRepository.save(userProfile.getUser());
-        userPaymentMethodRepository.save(userPaymentMethod);
-        userExpenseCategoryRepository.save(userExpenseCategory);
         expenseRepository.save(expense);
 
         //push from persistence context to actual db
@@ -113,15 +126,6 @@ public class ExpenseDomainIntegrationTest {
                         .stream()
                         .anyMatch(pm ->
                                 pm.getId().equals(savedExpense.getUserExpenseCategory().getId())
-                        )
-        );
-
-        assertTrue(
-                savedExpense.getUserProfile()
-                        .getUserExpenseSubCategories()
-                        .stream()
-                        .anyMatch(pm ->
-                                pm.getId().equals(savedExpense.getUserExpenseSubCategory().getId())
                         )
         );
 
@@ -171,58 +175,67 @@ public class ExpenseDomainIntegrationTest {
                 savedExpense.getUserProfile().getUserId(),
                 savedExpense.getUserExpenseCategory().getUserProfile().getUserId()
         );
-
-        //User <-> UserExpenseSubCategory consistency check
-        assertEquals(
-                savedExpense.getUserProfile().getUserId(),
-                savedExpense.getUserExpenseSubCategory().getUserProfile().getUserId()
-        );
     }
 
     @Test
     void shouldPersistMultipleExpensesUsingDifferentUserPaymentMethods() {
-        UserProfile userProfile = new UserProfileBuilder()
-                .user()
+        User user = new UserBuilder()
+                .identityIssuer("issuer")
+                .identitySubject(ExpenseFixtureBuilder.getRandomSubject())
                 .build();
+
+        UserProfile userProfile = new UserProfile();
+        userProfile.setCompleted(true);
+        user.setUserProfile(userProfile);
+
 
         UserPaymentMethod card = new UserPaymentMethodBuilder()
-                .userProfile(userProfile)
-                .name("CARD")
+                .name("card")
                 .build();
+        userProfile.addNewUserPaymentMethod(card);
 
         UserPaymentMethod cash = new UserPaymentMethodBuilder()
-                .userProfile(userProfile)
-                .name("CASH")
+                .name("cash")
                 .build();
+        userProfile.addNewUserPaymentMethod(cash);
 
+        String name = "Grocery";
         UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
-                .userProfile(userProfile)
+                .name(name)
                 .build();
+        userProfile.addNewUserCategory(userExpenseCategory);
 
         UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategoryBuilder()
-                .userProfile(userProfile)
-                .userExpenseCategory(userExpenseCategory)
+                .name("UESC")
                 .build();
-
-        Expense cardExpense = new ExpenseBuilder()
-                .userProfile(userProfile)
-                .userPaymentMethod(card)
-                .userExpenseCategory(userExpenseCategory)
-                .userExpenseSubCategory(userExpenseSubCategory)
-                .build();
-
-        Expense cashExpense = new ExpenseBuilder()
-                .userProfile(userProfile)
-                .userPaymentMethod(cash)
-                .userExpenseCategory(userExpenseCategory)
-                .userExpenseSubCategory(userExpenseSubCategory)
-                .build();
+        userExpenseCategory.addNewSubCategoryRelatedWithThisCategory(userExpenseSubCategory);
 
         userRepository.save(userProfile.getUser());
-        userPaymentMethodRepository.save(card);
-        userPaymentMethodRepository.save(cash);
-        userExpenseCategoryRepository.save(userExpenseCategory);
+
+        Expense cardExpense = new ExpenseBuilder()
+                .comment("comment")
+                .date(new Date())
+                .value(100d)
+                .build();
+
+        cardExpense.setUserPaymentMethod(card);
+        cardExpense.setUserExpenseCategory(userExpenseCategory);
+        cardExpense.setUserExpenseSubCategory(userExpenseSubCategory);
+        userProfile.addNewExpense(cardExpense);
+
         expenseRepository.save(cardExpense);
+
+        Expense cashExpense = new ExpenseBuilder()
+                .comment("comment")
+                .date(new Date())
+                .value(100d)
+                .build();
+
+        cashExpense.setUserPaymentMethod(cash);
+        cashExpense.setUserExpenseCategory(userExpenseCategory);
+        cashExpense.setUserExpenseSubCategory(userExpenseSubCategory);
+        userProfile.addNewExpense(cashExpense);
+
         expenseRepository.save(cashExpense);
 
         em.flush();

@@ -1,8 +1,10 @@
 package com.easyexpenses.api.repositories;
 
-import com.easyexpenses.api.builders.UserProfileBuilder;
+import com.easyexpenses.api.builders.ExpenseFixtureBuilder;
+import com.easyexpenses.api.builders.UserBuilder;
 import com.easyexpenses.api.builders.UserExpenseCategoryBuilder;
 import com.easyexpenses.api.builders.UserExpenseSubCategoryBuilder;
+import com.easyexpenses.api.entities.User;
 import com.easyexpenses.api.entities.UserProfile;
 import com.easyexpenses.api.entities.UserExpenseCategory;
 import com.easyexpenses.api.entities.UserExpenseSubCategory;
@@ -39,22 +41,27 @@ public class UserExpenseSubCategoryTest {
 
     @Test
     void shouldConvertNameToUppercase() {
-        UserProfile userProfile = new UserProfileBuilder()
-                .user()
+        User user = new UserBuilder()
+                .identityIssuer("issuer")
+                .identitySubject(ExpenseFixtureBuilder.getRandomSubject())
                 .build();
+
+        UserProfile userProfile = new UserProfile();
+        userProfile.setCompleted(false);
+        user.setUserProfile(userProfile);
 
         String name = "Grocery";
         UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
-                .userProfile(userProfile)
-                .name("Shopping")
+                .name("UEC")
                 .build();
-        UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategoryBuilder()
-                .userProfile(userProfile)
-                .name(name)
-                .userExpenseCategory(userExpenseCategory)
-                .build();
+        userProfile.addNewUserCategory(userExpenseCategory);
 
-        userRepository.save(userProfile.getUser());
+        UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategoryBuilder()
+                .name(name)
+                .build();
+        userExpenseCategory.addNewSubCategoryRelatedWithThisCategory(userExpenseSubCategory);
+
+        userRepository.save(user);
         UserExpenseCategory savedUserExpenseCategory=userExpenseCategoryRepository.save(userExpenseCategory);
 
         UserExpenseSubCategory savedUserExpenseSubCategory = savedUserExpenseCategory.getSubCategoriesRelatedWithThisCategory().stream().findFirst().orElseThrow();
@@ -63,30 +70,32 @@ public class UserExpenseSubCategoryTest {
 
     @Test
     void shouldThrowExceptionWhenNameIsNotUnique() {
-        //entities & relationships data
-        UserProfile userProfile = new UserProfileBuilder()
-                .user()
+        User user = new UserBuilder()
+                .identityIssuer("issuer")
+                .identitySubject(ExpenseFixtureBuilder.getRandomSubject())
                 .build();
+
+        UserProfile userProfile = new UserProfile();
+        userProfile.setCompleted(false);
+        user.setUserProfile(userProfile);
 
         String name = "Grocery";
         UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
-                .userProfile(userProfile)
-                .name("Shopping")
+                .name("UEC")
                 .build();
-        UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategoryBuilder()
-                .userProfile(userProfile)
-                .name(name)
-                .userExpenseCategory(userExpenseCategory)
-                .build();
+        userProfile.addNewUserCategory(userExpenseCategory);
 
-        userRepository.save(userProfile.getUser());
-        userExpenseCategoryRepository.save(userExpenseCategory);
+        UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategoryBuilder()
+                .name(name)
+                .build();
+        userExpenseCategory.addNewSubCategoryRelatedWithThisCategory(userExpenseSubCategory);
+
+        userRepository.save(user);
 
         UserExpenseSubCategory duplicateUserExpenseSubCategory = new UserExpenseSubCategoryBuilder()
-                .userProfile(userProfile)
                 .name(name)
-                .userExpenseCategory(userExpenseCategory)
                 .build();
+        userExpenseCategory.addNewSubCategoryRelatedWithThisCategory(duplicateUserExpenseSubCategory);
 
         assertThrows(ConstraintViolationException.class, () -> {
             userExpenseCategoryRepository.save(userExpenseCategory);
@@ -97,38 +106,49 @@ public class UserExpenseSubCategoryTest {
 
     @Test
     void shouldAllowTheSameNameForDifferentUsers() {
-        UserProfile firstUser = new UserProfileBuilder()
-                .user()
+        User firstUser = new UserBuilder()
+                .identityIssuer("issuer")
+                .identitySubject(ExpenseFixtureBuilder.getRandomSubject())
                 .build();
+
+        UserProfile firstUserProfile = new UserProfile();
+        firstUserProfile.setCompleted(false);
+        firstUser.setUserProfile(firstUserProfile);
 
         String name = "Grocery";
         UserExpenseCategory firstUserExpenseCategory = new UserExpenseCategoryBuilder()
-                .userProfile(firstUser)
-                .name("Shopping")
+                .name("UEC")
                 .build();
-        UserExpenseSubCategory firstUserExpenseSubCategory = new UserExpenseSubCategoryBuilder()
-                .userProfile(firstUser)
-                .name(name)
-                .userExpenseCategory(firstUserExpenseCategory)
-                .build();
+        firstUserProfile.addNewUserCategory(firstUserExpenseCategory);
 
-        userRepository.save(firstUser.getUser());
+        UserExpenseSubCategory firstUserExpenseSubCategory = new UserExpenseSubCategoryBuilder()
+                .name(name)
+                .build();
+        firstUserExpenseCategory.addNewSubCategoryRelatedWithThisCategory(firstUserExpenseSubCategory);
+
+        userRepository.save(firstUser);
         UserExpenseCategory firstSavedUserExpenseCategory=userExpenseCategoryRepository.save(firstUserExpenseCategory);
 
-        UserProfile secondUser = new UserProfileBuilder()
-                .user()
-                .build();
-        UserExpenseCategory secondUserExpenseCategory = new UserExpenseCategoryBuilder()
-                .userProfile(secondUser)
-                .name("Travel")
-                .build();
-        UserExpenseSubCategory secondUserExpenseSubCategory = new UserExpenseSubCategoryBuilder()
-                .userProfile(secondUser)
-                .name(name)
-                .userExpenseCategory(secondUserExpenseCategory)
+        User secondUser = new UserBuilder()
+                .identityIssuer("issuer")
+                .identitySubject(ExpenseFixtureBuilder.getRandomSubject())
                 .build();
 
-        userRepository.save(secondUser.getUser());
+        UserProfile secondUserProfile = new UserProfile();
+        secondUserProfile.setCompleted(false);
+        secondUser.setUserProfile(secondUserProfile);
+
+        UserExpenseCategory secondUserExpenseCategory = new UserExpenseCategoryBuilder()
+                .name("UEC")
+                .build();
+        secondUserProfile.addNewUserCategory(secondUserExpenseCategory);
+
+        UserExpenseSubCategory secondUserExpenseSubCategory = new UserExpenseSubCategoryBuilder()
+                .name(name)
+                .build();
+        secondUserExpenseCategory.addNewSubCategoryRelatedWithThisCategory(secondUserExpenseSubCategory);
+
+        userRepository.save(secondUser);
         UserExpenseCategory secondSavedUserExpenseCategory=userExpenseCategoryRepository.save(secondUserExpenseCategory);
 
         UserExpenseSubCategory firstSavedUserExpenseSubCategory = firstSavedUserExpenseCategory.getSubCategoriesRelatedWithThisCategory().stream().findFirst().orElseThrow();

@@ -35,17 +35,22 @@ public class UserPaymentMethodTest {
 
     @Test
     void shouldConvertNameToUppercase() {
-        UserProfile userProfile = new UserProfileBuilder()
-                .user()
+        User user = new UserBuilder()
+                .identityIssuer("issuer")
+                .identitySubject(ExpenseFixtureBuilder.getRandomSubject())
                 .build();
+
+        UserProfile userProfile = new UserProfile();
+        userProfile.setCompleted(false);
+        user.setUserProfile(userProfile);
 
         String name = "Cash";
         UserPaymentMethod userPaymentMethod = new UserPaymentMethodBuilder()
-                .userProfile(userProfile)
                 .name(name)
                 .build();
+        userProfile.addNewUserPaymentMethod(userPaymentMethod);
 
-        userRepository.save(userProfile.getUser());
+        userRepository.save(user);
         userPaymentMethodRepository.save(userPaymentMethod);
 
         UserPaymentMethod savedUserPaymentMethod = userPaymentMethodRepository.findById(userPaymentMethod.getId()).orElseThrow();
@@ -54,26 +59,31 @@ public class UserPaymentMethodTest {
 
     @Test
     void shouldThrowExceptionWhenNameIsNotUnique() {
-        UserProfile userProfile = new UserProfileBuilder()
-                .user()
+        User user = new UserBuilder()
+                .identityIssuer("issuer")
+                .identitySubject(ExpenseFixtureBuilder.getRandomSubject())
                 .build();
+
+        UserProfile userProfile = new UserProfile();
+        userProfile.setCompleted(false);
+        user.setUserProfile(userProfile);
 
         String name = "Cash";
         UserPaymentMethod userPaymentMethod = new UserPaymentMethodBuilder()
-                .userProfile(userProfile)
                 .name(name)
                 .build();
+        userProfile.addNewUserPaymentMethod(userPaymentMethod);
 
-        userRepository.save(userProfile.getUser());
+        userRepository.save(user);
         userPaymentMethodRepository.save(userPaymentMethod);
 
         em.flush();
         em.clear();
 
         UserPaymentMethod duplicateUserPaymentMethod = new UserPaymentMethodBuilder()
-                .userProfile(userProfile)
                 .name(name)
                 .build();
+        userProfile.addNewUserPaymentMethod(duplicateUserPaymentMethod);
 
         assertThrows(ConstraintViolationException.class, () -> {
             userPaymentMethodRepository.save(duplicateUserPaymentMethod);
@@ -84,28 +94,39 @@ public class UserPaymentMethodTest {
 
     @Test
     void shouldAllowTheSameNameForDifferentUsers() {
-        UserProfile firstUser = new UserProfileBuilder()
-                .user()
+        User firstUser = new UserBuilder()
+                .identityIssuer("issuer")
+                .identitySubject(ExpenseFixtureBuilder.getRandomSubject())
                 .build();
+
+        UserProfile firstUserProfile = new UserProfile();
+        firstUserProfile.setCompleted(false);
+        firstUser.setUserProfile(firstUserProfile);
 
         String name = "Cash";
         UserPaymentMethod firstUserPaymentMethod = new UserPaymentMethodBuilder()
-                .userProfile(firstUser)
                 .name(name)
                 .build();
+        firstUserProfile.addNewUserPaymentMethod(firstUserPaymentMethod);
 
-        userRepository.save(firstUser.getUser());
+        userRepository.save(firstUser);
         userPaymentMethodRepository.save(firstUserPaymentMethod);
 
-        UserProfile secondUser = new UserProfileBuilder()
-                .user()
-                .build();
-        UserPaymentMethod secondUserPaymentMethod = new UserPaymentMethodBuilder()
-                .userProfile(secondUser)
-                .name(name)
+        User secondUser = new UserBuilder()
+                .identityIssuer("issuer")
+                .identitySubject(ExpenseFixtureBuilder.getRandomSubject())
                 .build();
 
-        userRepository.save(secondUser.getUser());
+        UserProfile secondUserProfile = new UserProfile();
+        secondUserProfile.setCompleted(false);
+        secondUser.setUserProfile(secondUserProfile);
+
+        UserPaymentMethod secondUserPaymentMethod = new UserPaymentMethodBuilder()
+                .name(name)
+                .build();
+        secondUserProfile.addNewUserPaymentMethod(secondUserPaymentMethod);
+
+        userRepository.save(secondUser);
         userPaymentMethodRepository.save(secondUserPaymentMethod);
 
         em.flush();

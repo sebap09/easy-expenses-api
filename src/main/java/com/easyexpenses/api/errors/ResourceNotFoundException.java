@@ -1,5 +1,8 @@
 package com.easyexpenses.api.errors;
 
+import lombok.Getter;
+
+@Getter
 public class ResourceNotFoundException extends RuntimeException {
     private final ErrorCode errorCode;
 

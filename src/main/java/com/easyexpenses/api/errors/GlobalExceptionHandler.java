@@ -21,9 +21,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ProblemDetail handleNotFound(ResourceNotFoundException ex) {
-        return ProblemDetail.forStatusAndDetail(
+        ProblemDetail problemDetail =  ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
                 ex.getMessage());
+        problemDetail.setProperty("errorCode", ex.getErrorCode());
+        return problemDetail;
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)

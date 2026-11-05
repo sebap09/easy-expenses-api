@@ -3,11 +3,11 @@ package com.easyexpenses.api.controllers;
 import com.easyexpenses.api.builders.ExpenseFixtureBuilder;
 import com.easyexpenses.api.dtos.AddNewExpenseRequest;
 import com.easyexpenses.api.dtos.ExpenseResponse;
-import com.easyexpenses.api.entities.UserProfile;
+import com.easyexpenses.api.errors.ErrorCode;
 import com.easyexpenses.api.errors.ResourceNotFoundException;
 import com.easyexpenses.api.fixtures.ExpenseFixture;
 import com.easyexpenses.api.services.ExpenseService;
-import com.easyexpenses.api.services.UserProfileService;
+import com.easyexpenses.api.services.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -45,7 +45,7 @@ public class ExpenseControllerTest {
     private ExpenseService expenseService;
 
     @MockitoBean
-    private UserProfileService userProfileService;
+    private UserService userService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -56,6 +56,7 @@ public class ExpenseControllerTest {
         double value = 100d;
         Date date = new Date();
         String comment = "comment";
+        Long userId = expenseFixture.getUserProfile().getUserId();
 
         AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
                 expenseFixture.getUserExpenseCategory().getId(),
@@ -76,10 +77,10 @@ public class ExpenseControllerTest {
                 comment
         );
 
-        when(userProfileService.findOrCreateUser(any(Jwt.class)))
-                .thenReturn(expenseFixture.getUserProfile());
+        when(userService.findOrCreateUser(any(Jwt.class)))
+                .thenReturn(userId);
 
-        when(expenseService.addNewExpense(any(UserProfile.class), any(AddNewExpenseRequest.class)))
+        when(expenseService.addNewExpense(userId, addNewExpenseRequest))
                 .thenReturn(expenseResponse);
 
 
@@ -109,12 +110,13 @@ public class ExpenseControllerTest {
                 .isEqualTo(expenseResponse);
 
         verify(expenseService)
-                .addNewExpense(expenseFixture.getUserProfile(), addNewExpenseRequest);
+                .addNewExpense(userId, addNewExpenseRequest);
     }
 
     @Test
     void shouldReturnListOfExpensesWhenExpensesExist() throws Exception {
         ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
+        Long userId = expenseFixture.getUserProfile().getUserId();
         ExpenseResponse expenseResponse = new ExpenseResponse(
                 1L,
                 expenseFixture.getUserExpenseCategory().getId(),
@@ -127,10 +129,10 @@ public class ExpenseControllerTest {
 
         List<ExpenseResponse> expenseResponses = List.of(expenseResponse);
 
-        when(userProfileService.findOrCreateUser(any(Jwt.class)))
-                .thenReturn(expenseFixture.getUserProfile());
+        when(userService.findOrCreateUser(any(Jwt.class)))
+                .thenReturn(userId);
 
-        when(expenseService.getAllExpenses(any(UserProfile.class)))
+        when(expenseService.getAllExpenses(userId))
                 .thenReturn(expenseResponses);
 
 
@@ -162,22 +164,22 @@ public class ExpenseControllerTest {
 
     @Test
     void shouldReturn404WhenInvalidConfigurationProvided() throws Exception {
-        ExpenseFixture expenseFixture = new ExpenseFixtureBuilder().build();
-        String errorMessage = "Resource Not Found";
+        Long userId = 1L;
+        String errorMessage = "User Payment Method was not found for this user!";
         AddNewExpenseRequest addNewExpenseRequest = new AddNewExpenseRequest(
-                expenseFixture.getUserExpenseCategory().getId(),
-                expenseFixture.getUserExpenseSubCategory().getId(),
-                expenseFixture.getUserPaymentMethod().getId(),
+                1L,
+                1L,
+                1L,
                 new Date(),
                 100d,
                 "comment"
         );
 
-        when(userProfileService.findOrCreateUser(any(Jwt.class)))
-                .thenReturn(expenseFixture.getUserProfile());
+        when(userService.findOrCreateUser(any(Jwt.class)))
+                .thenReturn(userId);
 
-        when(expenseService.addNewExpense(expenseFixture.getUserProfile(), addNewExpenseRequest))
-                .thenThrow(new ResourceNotFoundException(errorMessage));
+        when(expenseService.addNewExpense(userId, addNewExpenseRequest))
+                .thenThrow(new ResourceNotFoundException(errorMessage, ErrorCode.USER_PAYMENT_METHOD_NOT_FOUND));
 
 
         mockMvc.perform(
@@ -191,10 +193,11 @@ public class ExpenseControllerTest {
                 .andExpect(jsonPath("$.detail").value(errorMessage))
                 .andExpect(jsonPath("$.instance").value(EXPENSES_ENDPOINT))
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.title").value("Not Found"));
+                .andExpect(jsonPath("$.title").value("Not Found"))
+                .andExpect(jsonPath("$.errorCode").value(ErrorCode.USER_PAYMENT_METHOD_NOT_FOUND.toString()));
 
         verify(expenseService)
-                .addNewExpense(expenseFixture.getUserProfile(), addNewExpenseRequest);
+                .addNewExpense(userId, addNewExpenseRequest);
     }
 
     @Test
