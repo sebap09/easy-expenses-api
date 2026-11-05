@@ -6,23 +6,22 @@ import com.easyexpenses.api.builders.UserExpenseSubCategoryBuilder;
 import com.easyexpenses.api.builders.UserPaymentMethodBuilder;
 import com.easyexpenses.api.dtos.userprofile.request.CategoryReq;
 import com.easyexpenses.api.dtos.userprofile.request.UserProfileRequest;
-import com.easyexpenses.api.dtos.userprofile.response.CategoryRes;
-import com.easyexpenses.api.dtos.userprofile.response.PaymentMethodRes;
-import com.easyexpenses.api.dtos.userprofile.response.SubCategoryRes;
-import com.easyexpenses.api.dtos.userprofile.response.UserProfileResponse;
+import com.easyexpenses.api.dtos.userprofile.response.*;
 import com.easyexpenses.api.entities.UserExpenseCategory;
+import com.easyexpenses.api.entities.UserExpenseSubCategory;
 import com.easyexpenses.api.entities.UserPaymentMethod;
 import com.easyexpenses.api.entities.UserProfile;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserProfileMapper {
-    public UserProfileResponse toResponse(Set<UserPaymentMethod> userPaymentMethods, Set<UserExpenseCategory> userExpenseCategories) {
-        List<PaymentMethodRes> paymentMethods = userPaymentMethods.stream()
+    public CompletedUserProfileResponse toCompletedUserProfileResponse(UserProfile userProfile, Set<UserExpenseCategory> userExpenseCategories) {
+        List<PaymentMethodRes> paymentMethods = userProfile.getUserPaymentMethods().stream()
                 .map(userPaymentMethod -> new PaymentMethodRes(
                         userPaymentMethod.getId(),
                         userPaymentMethod.getName()))
@@ -41,32 +40,35 @@ public class UserProfileMapper {
                 .toList();
 
 
-        return new UserProfileResponse(paymentMethods, categories);
+        return new CompletedUserProfileResponse(userProfile.isCompleted(), paymentMethods, categories);
     }
 
-    public List<UserPaymentMethod> fromRequestToPaymentMethods(UserProfile userProfile, UserProfileRequest userProfileRequest) {
+    public NotCompletedUserProfileResponse toNotCompletedUserProfileResponse(UserProfile userProfile){
+        return new NotCompletedUserProfileResponse(userProfile.isCompleted());
+    }
+    public Set<UserPaymentMethod> fromRequestToPaymentMethods(UserProfileRequest userProfileRequest) {
         return userProfileRequest.paymentMethods().stream().map(paymentMethod -> new UserPaymentMethodBuilder()
-                .userProfile(userProfile)
                 .name(paymentMethod)
-                .build()).toList();
+                .build()).collect(Collectors.toSet());
     }
 
-    public List<UserExpenseCategory> fromRequestToCategories(UserProfile userProfile, UserProfileRequest userProfileRequest) {
-        List<UserExpenseCategory> categories = new ArrayList<>();
+    public Set<UserExpenseCategory> fromRequestToCategories(UserProfileRequest userProfileRequest) {
+        Set<UserExpenseCategory> categories = new HashSet<>();
         for(CategoryReq category: userProfileRequest.categories()){
             UserExpenseCategory userExpenseCategory = new UserExpenseCategoryBuilder()
-                    .userProfile(userProfile)
                     .name(category.name())
                     .build();
-            categories.add(userExpenseCategory);
-            for(String subCategory: category.subCategories()){
-                new UserExpenseSubCategoryBuilder()
-                        .name(subCategory)
-                        .userExpenseCategory(userExpenseCategory)
-                        .build();
-            }
-        }
 
+            for(String subCategory: category.subCategories()){
+                UserExpenseSubCategory userExpenseSubCategory = new UserExpenseSubCategoryBuilder()
+                        .name(subCategory)
+                        .build();
+
+                userExpenseCategory.addNewSubCategoryRelatedWithThisCategory(userExpenseSubCategory);
+            }
+
+            categories.add(userExpenseCategory);
+        }
 
         return categories;
     }

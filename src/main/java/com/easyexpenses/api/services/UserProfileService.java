@@ -1,6 +1,7 @@
 package com.easyexpenses.api.services;
 
 import com.easyexpenses.api.dtos.userprofile.request.UserProfileRequest;
+import com.easyexpenses.api.dtos.userprofile.response.CompletedUserProfileResponse;
 import com.easyexpenses.api.dtos.userprofile.response.UserProfileResponse;
 import com.easyexpenses.api.entities.UserExpenseCategory;
 import com.easyexpenses.api.entities.UserPaymentMethod;
@@ -12,20 +13,21 @@ import com.easyexpenses.api.repositories.UserProfileRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Set;
 
 @Service
 public class UserProfileService {
+    private static final int MAX_PAYMENT_METHODS_LIMIT = 20;
+    private static final int MAX_CATEGORIES_LIMIT = 30;
+    private static final int MAX_SUB_CATEGORIES_LIMIT = 20;
+
     private final UserProfileRepository userProfileRepository;
     private final UserProfileMapper userProfileMapper;
-    private final UserPaymentMethodService userPaymentMethodService;
     private final UserExpenseCategoryService userExpenseCategoryService;
 
-    public UserProfileService(UserProfileRepository userProfileRepository, UserProfileMapper userProfileMapper, UserPaymentMethodService userPaymentMethodService, UserExpenseCategoryService userExpenseCategoryService) {
+    public UserProfileService(UserProfileRepository userProfileRepository, UserProfileMapper userProfileMapper, UserExpenseCategoryService userExpenseCategoryService) {
         this.userProfileRepository = userProfileRepository;
         this.userProfileMapper = userProfileMapper;
-        this.userPaymentMethodService = userPaymentMethodService;
         this.userExpenseCategoryService = userExpenseCategoryService;
     }
 
@@ -35,29 +37,70 @@ public class UserProfileService {
 
     @Transactional(readOnly = true)
     public UserProfileResponse getUserProfileData(Long userId){
-        UserProfile userProfile = getUserProfileById(userId);;
-
-        Set<UserPaymentMethod> paymentMethods = userProfile.getUserPaymentMethods();
-        Set<UserExpenseCategory> categories = userExpenseCategoryService.getAllWithUserSubExpenseCategoriesByUserId(userId);
-        return userProfileMapper.toResponse(paymentMethods, categories);
-    }
-
-    public UserProfileResponse setUserProfileData(Long userId, UserProfileRequest userProfileRequest) {
         UserProfile userProfile = getUserProfileById(userId);
-        if (!isConfigEmpty(userProfile))
-            throw new ValidationException("Config already exists for this user", ErrorCode.CONFIG_ALREADY_EXISTS);
+        if(!isProfileAlreadyCompleted(userProfile))
+            return userProfileMapper.toNotCompletedUserProfileResponse(userProfile);
 
-        List<UserPaymentMethod> paymentMethods = userProfileMapper.fromRequestToPaymentMethods(userProfile, userProfileRequest);
-        List<UserExpenseCategory> categories = userProfileMapper.fromRequestToCategories(userProfile, userProfileRequest);
-
-        List<UserPaymentMethod> savedPaymentMethods = userPaymentMethodService.saveAll(paymentMethods);
-        List<UserExpenseCategory> savedCategories = userExpenseCategoryService.saveAll(categories);
-
-        return userProfileMapper.toResponse(savedPaymentMethods, savedCategories);
+        Set<UserExpenseCategory> categories = userExpenseCategoryService.getAllWithUserSubExpenseCategoriesByUserId(userId);
+        return userProfileMapper.toCompletedUserProfileResponse(userProfile, categories);
     }
 
-    private boolean isConfigEmpty(UserProfile userProfile){
-        UserProfileResponse userProfileResponse = getUserProfileData(userProfile.getUserId());
-        return userProfileResponse.categories().isEmpty() && userProfileResponse.paymentMethods().isEmpty();
+    @Transactional
+    public CompletedUserProfileResponse setUserProfileData(Long userId, UserProfileRequest userProfileRequest) {
+        validateLimitOfUserProfileConfig(userProfileRequest);
+
+        UserProfile userProfile = getUserProfileById(userId);
+        validateIfUserProfileIsAlreadyCompleted(userProfile);
+
+        Set<UserPaymentMethod> paymentMethods = userProfileMapper.fromRequestToPaymentMethods(userProfileRequest);
+        Set<UserExpenseCategory> categories = userProfileMapper.fromRequestToCategories(userProfileRequest);
+
+        paymentMethods.forEach(userProfile::addNewUserPaymentMethod);
+        categories.forEach(userProfile::addNewUserCategory);
+
+        userProfile.setCompleted(true);
+
+        UserProfile completedUserProfile = userProfileRepository.save(userProfile);
+
+        return userProfileMapper.toCompletedUserProfileResponse(completedUserProfile, completedUserProfile.getUserExpenseCategories());
+    }
+
+    private void validateLimitOfUserProfileConfig(UserProfileRequest userProfileRequest){
+        if (isMaxNumberOfUserPaymentMethodsExceeded(userProfileRequest))
+            throw new ValidationException(String.format("Limit [%d] of user payment methods was exceeded!", MAX_PAYMENT_METHODS_LIMIT), ErrorCode.MAX_NUMBER_OF_USER_PAYMENT_METHODS_EXCEEDED);
+
+        if (isMaxNumberOfUserExpenseCategoriesExceeded(userProfileRequest))
+            throw new ValidationException(String.format("Limit [%d] of user expense categories was exceeded!", MAX_CATEGORIES_LIMIT), ErrorCode.MAX_NUMBER_OF_USER_EXPENSE_CATEGORIES_EXCEEDED);
+
+        validateIfMaxNumberOfUserExpenseSubCategoriesExceeded(userProfileRequest);
+    }
+
+    private boolean isMaxNumberOfUserPaymentMethodsExceeded(UserProfileRequest userProfileRequest){
+        return userProfileRequest.paymentMethods().size() > MAX_PAYMENT_METHODS_LIMIT;
+    }
+
+    private boolean isMaxNumberOfUserExpenseCategoriesExceeded(UserProfileRequest userProfileRequest){
+        return userProfileRequest.categories().size() > MAX_CATEGORIES_LIMIT;
+    }
+
+    private void validateIfMaxNumberOfUserExpenseSubCategoriesExceeded(UserProfileRequest userProfileRequest){
+        userProfileRequest.categories().stream().filter(
+                        categoryReq -> categoryReq.subCategories().size() > MAX_SUB_CATEGORIES_LIMIT)
+                .findFirst()
+                .ifPresent(
+                        invalidCategory -> {
+                            throw new ValidationException(
+                                    String.format("Limit [%d] of user expense sub categories was exceeded for [%s] user expense category!", MAX_SUB_CATEGORIES_LIMIT, invalidCategory),
+                                    ErrorCode.MAX_NUMBER_OF_USER_EXPENSE_SUB_CATEGORIES_EXCEEDED);
+                        });
+    }
+
+    private void validateIfUserProfileIsAlreadyCompleted(UserProfile userProfile){
+        if (isProfileAlreadyCompleted(userProfile))
+            throw new ValidationException("User Profile is already completed!", ErrorCode.USER_PROFILE_IS_ALREADY_COMPLETED);
+    }
+
+    private boolean isProfileAlreadyCompleted(UserProfile userProfile){
+        return userProfile.isCompleted();
     }
 }
