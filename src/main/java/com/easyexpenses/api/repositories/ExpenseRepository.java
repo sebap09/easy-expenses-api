@@ -4,7 +4,6 @@ import com.easyexpenses.api.entities.Expense;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,17 +11,8 @@ import java.util.List;
 
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
-    @Query("""
-        SELECT e
-        FROM Expense e
-        WHERE e.userProfile.userId = :userId
-    """)
-    List<Expense> findAllByUserId(Long userId);
 
-    @Query("""
-        SELECT e
-        FROM Expense e
-        WHERE e.userProfile.userId = :userId
-    """)
-    Page<Expense> findAllByUserIdWithPagination(Long userId, Pageable pageable);
+    List<Expense> findByUserProfileUserId(Long userId);
+
+    Page<Expense> findByUserProfileUserId(Long userId, Pageable pageable);
 }
